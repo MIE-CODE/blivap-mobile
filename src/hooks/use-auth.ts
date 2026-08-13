@@ -18,7 +18,7 @@ export const useAuth = () => {
     console.log({ fullName, phoneNumber, email, password });
     router.push("/verify-otp");
   };
-
+  //otp
   const verifyOtp = (payload: string) => {
     if (payload.length === 4) {
       router.push("/login");
