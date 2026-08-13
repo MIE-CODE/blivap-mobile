@@ -2,12 +2,15 @@
 
 # dependencies
 node_modules/
+.pnpm-store/
+jspm_packages/
 
 # Expo
 .expo/
 dist/
 web-build/
 expo-env.d.ts
+.expo-shared/
 
 # Native
 .kotlin/
@@ -17,27 +20,91 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+*.keystore
+
+# generated native folders (Expo CNG / prebuild)
+/ios
+/android
 
 # Metro
 .metro-health-check*
+.metro/
 
-# debug
+# bundler / build caches
+.cache/
+*.cache
+.turbo/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# debug / logs
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+pnpm-debug.*
+lerna-debug.*
+*.log
+logs/
 
-# macOS
-.DS_Store
+# testing / coverage
+coverage/
+.nyc_output/
+*.lcov
+jest-cache/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
 *.pem
+*.p12
+google-services.json
+GoogleService-Info.plist
+credentials.json
+secrets/
+*.secret
 
-# local env files
-.env*.local
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# typescript
-*.tsbuildinfo
+# editors / IDEs
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+.history/
+.cursor/
+.claude/
 
+# misc
+*.tgz
+*.tar.gz
+tmp/
+temp/
+*.tmp
+*.bak
+*.old
 example
 
-# generated native folders
-/ios
-/android
+# EAS / Expo Application Services
+eas-update-local/
+
+# Expo doctor / local diagnostics
+.expo-doctor/
