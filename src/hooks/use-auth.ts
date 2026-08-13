@@ -10,7 +10,6 @@ import { ILogin, IRegister } from "../../types/user";
 
 export const useAuth = () => {
   const dispatch = useAppDispatch();
-
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const register = async (payload: IRegister) => {
