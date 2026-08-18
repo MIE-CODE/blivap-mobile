@@ -58,35 +58,34 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
-export const Fonts = Platform.select({
-  ios: {
-    sans: "Inter_400Regular",
-    sansMedium: "Inter_500Medium",
-    sansSemiBold: "Inter_600SemiBold",
-    sansBold: "Inter_700Bold",
-    heading: "Poppins_600SemiBold",
-    headingBold: "Poppins_700Bold",
-    mono: "ui-monospace",
+/** Loaded PostScript names from @expo-google-fonts (use these as fontFamily). */
+export const Fonts = {
+  poppins: {
+    regular: "Poppins_400Regular",
+    medium: "Poppins_500Medium",
+    semiBold: "Poppins_600SemiBold",
+    bold: "Poppins_700Bold",
   },
-  default: {
-    sans: "Inter_400Regular",
-    sansMedium: "Inter_500Medium",
-    sansSemiBold: "Inter_600SemiBold",
-    sansBold: "Inter_700Bold",
-    heading: "Poppins_600SemiBold",
-    headingBold: "Poppins_700Bold",
-    mono: "monospace",
+  inter: {
+    regular: "Inter_400Regular",
+    medium: "Inter_500Medium",
+    semiBold: "Inter_600SemiBold",
+    bold: "Inter_700Bold",
   },
-  web: {
-    sans: "var(--font-display)",
-    sansMedium: "var(--font-display)",
-    sansSemiBold: "var(--font-display)",
-    sansBold: "var(--font-display)",
-    heading: "var(--font-heading)",
-    headingBold: "var(--font-heading)",
-    mono: "var(--font-mono)",
-  },
-});
+  /** Default body/UI stack — Poppins */
+  sans: "Poppins_400Regular",
+  sansMedium: "Poppins_500Medium",
+  sansSemiBold: "Poppins_600SemiBold",
+  sansBold: "Poppins_700Bold",
+  heading: "Poppins_600SemiBold",
+  headingBold: "Poppins_700Bold",
+  mono: Platform.select({ ios: "ui-monospace", default: "monospace" })!,
+} as const;
+
+export type FontFamily =
+  | (typeof Fonts.poppins)[keyof typeof Fonts.poppins]
+  | (typeof Fonts.inter)[keyof typeof Fonts.inter]
+  | typeof Fonts.mono;
 
 export const Spacing = {
   half: 2,

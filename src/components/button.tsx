@@ -46,7 +46,6 @@ export const Button = ({
   const theme = useTheme();
   return (
     <Pressable
-      disabled={props.disabled}
       style={[
         {
           flexDirection: "row",

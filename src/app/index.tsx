@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text } from "react-native";
 
 import { Button } from "@/components/button";
 import { Spacer } from "@/components/spacer";
@@ -32,7 +32,7 @@ export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
   return (
-    <ThemedView safe>
+    <ThemedView safe style={{ flex: 1 }}>
       <Carousel height={550} autoPlay>
         <ThemedView
           style={{
@@ -40,17 +40,15 @@ export default function HomeScreen() {
             alignItems: "center",
           }}
         >
-          <Spacer height={254} />
-          <ThemedText
-            style={{
-              textAlign: "center",
-              fontSize: 24,
-              lineHeight: 22,
+          <Image
+            source={{
+              uri: "https://res.cloudinary.com/dqx8cvr76/image/upload/v1786832394/undraw_online-community_3o0l_d0jbb8.png",
             }}
-          >
-            This space will show penitent the apps main future
-          </ThemedText>
-          <Spacer height={159} />
+            style={{ width: "100%", height: 400 }}
+            resizeMode="contain"
+          />
+
+          <Spacer height={20} />
           <ThemedText style={{ fontSize: 24, fontWeight: "600" }}>
             WELCOME TO <Text style={{ color: theme.primary }}>BLIVAP</Text>
           </ThemedText>
@@ -59,8 +57,53 @@ export default function HomeScreen() {
             Africa’s largest Blood/Spam donation app
           </ThemedText>
         </ThemedView>
-        <View style={{ flex: 1, backgroundColor: "#ddd" }} />
-        <View style={{ flex: 1, backgroundColor: "#ccc" }} />
+        <ThemedView
+          style={{
+            flex: 1,
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={{
+              uri: "https://res.cloudinary.com/dqx8cvr76/image/upload/undraw_sharing-knowledge_2jx3_md6am6.png",
+            }}
+            style={{ width: "100%", height: 400 }}
+            resizeMode="contain"
+          />
+          <Spacer height={20} />
+          <ThemedText style={{ fontSize: 24, fontWeight: "600" }}>
+            MEET <Text style={{ color: theme.primary }}>DONORS</Text> NEAR YOU
+          </ThemedText>
+          <Spacer height={24} />
+          <ThemedText style={{ color: theme.border, textAlign: "center" }}>
+            Connect with verified blood donors in your area, ready to help when
+            it matters most
+          </ThemedText>
+        </ThemedView>
+        <ThemedView
+          style={{
+            flex: 1,
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={{
+              uri: "https://res.cloudinary.com/dqx8cvr76/image/upload/v1786831935/undraw_medicine_hqqg_tcia33.png",
+            }}
+            style={{ width: "100%", height: 400 }}
+            resizeMode="contain"
+          />
+          <Spacer height={20} />
+          <ThemedText style={{ fontSize: 24, fontWeight: "600" }}>
+            SAVE <Text style={{ color: theme.primary }}>LIVES</Text>, SAVE
+            SOCIETY
+          </ThemedText>
+          <Spacer height={24} />
+          <ThemedText style={{ color: theme.border, textAlign: "center" }}>
+            Every donation counts — join a community making a real difference,
+            one drop at a time
+          </ThemedText>
+        </ThemedView>
       </Carousel>
 
       <Spacer height={98} />

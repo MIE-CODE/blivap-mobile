@@ -9,10 +9,10 @@ import TabSwitcher, { Tab } from "@/components/tab";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BloodDonorTab } from "@/components/ui/home/blood-donor-tab";
-import { Colors } from "@/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { useAppSelector } from "../../../stores/hooks";
 export default function Home() {
   const { user } = useAppSelector((s) => s.auth);
@@ -24,7 +24,7 @@ export default function Home() {
       style={{ flex: 1, paddingBottom: 0, paddingHorizontal: 0 }}
     >
       <Spacer height={22} />
-      <View
+      <ThemedView
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
@@ -32,19 +32,25 @@ export default function Home() {
           alignItems: "center",
         }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <View
+        <ThemedView
+          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+        >
+          <Image
+            source={{ uri: user?.profileImage ?? "" }}
             style={{
               width: 36,
               height: 36,
-              backgroundColor: "red",
+              backgroundColor: "transparent",
               borderRadius: 100,
             }}
           />
-          <Text style={{ color: theme.primary, fontSize: 20, fontWeight: 900 }}>
+          <ThemedText
+            fontFamily={Fonts.inter.bold}
+            style={{ color: theme.primary, fontSize: 20, fontWeight: 900 }}
+          >
             Hey, {user ? user.firstname : "Will"}
-          </Text>
-        </View>
+          </ThemedText>
+        </ThemedView>
         <Pressable
           style={{
             padding: 4,
@@ -56,7 +62,7 @@ export default function Home() {
         >
           <NotificationsIcon color={theme.text} />
         </Pressable>
-      </View>
+      </ThemedView>
       <Spacer height={24} />
       <ScrollView
         contentContainerStyle={{
@@ -65,32 +71,36 @@ export default function Home() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <View
+        <ThemedView
           style={{
             borderRadius: 20,
             paddingHorizontal: 16,
             paddingVertical: 9,
             backgroundColor: theme.primary,
             gap: 25,
+            position: "relative",
           }}
         >
-          <View>
-            <View
+          <Image
+            source={{ uri: "@/assets/icons/home-bg.svg" }}
+            style={{ position: "absolute", width: "100%", height: "100%" }}
+          />
+          <ThemedView style={{ backgroundColor: "transparent" }}>
+            <ThemedView
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
+                backgroundColor: "transparent",
               }}
             >
-              <Text
+              <ThemedText
                 style={{
                   color: "#FFFFFFB2",
-                  fontSize: 14,
-                  fontWeight: 400,
                 }}
               >
                 My portfolio
-              </Text>
+              </ThemedText>
               <Button variant="ghost" size="none" onPress={() => {}}>
                 <Arrow
                   width={24}
@@ -99,7 +109,7 @@ export default function Home() {
                   style={{ transform: [{ rotate: "180deg" }] }}
                 />
               </Button>
-            </View>
+            </ThemedView>
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
             >
@@ -116,12 +126,18 @@ export default function Home() {
                 <EyeIcon />
               </Pressable>
             </View>
-          </View>
-          <View style={{ flexDirection: "row", gap: 16 }}>
+          </ThemedView>
+          <ThemedView
+            style={{
+              flexDirection: "row",
+              gap: 16,
+              backgroundColor: "transparent",
+            }}
+          >
             <Button
-              variant="soft"
+              variant="outline"
               size="small"
-              style={{ alignItems: "center" }}
+              style={{ borderColor: "#FFFFFF33" }}
               icon={<WithdrawIcon width={16} height={16} color={theme.text} />}
               onPress={() => logOut()}
             >
@@ -132,8 +148,9 @@ export default function Home() {
               </ThemedText>
             </Button>
             <Button
-              variant="soft"
+              variant="outline"
               size="small"
+              style={{ borderColor: "#FFFFFF33" }}
               icon={<PlusIcon width={16} height={16} />}
             >
               <ThemedText
@@ -142,8 +159,8 @@ export default function Home() {
                 Add Money
               </ThemedText>
             </Button>
-          </View>
-        </View>
+          </ThemedView>
+        </ThemedView>
         <Spacer height={16} />
         <TabSwitcher>
           <Tab title="Blood Donor">

@@ -46,7 +46,13 @@ export default function TabSwitcher({
                 isActive && { backgroundColor: theme.primary },
               ]}
             >
-              <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+              <Text
+                style={[
+                  styles.tabText,
+                  { color: theme.text },
+                  isActive && styles.activeTabText,
+                ]}
+              >
                 {tab.props.title}
               </Text>
             </Pressable>

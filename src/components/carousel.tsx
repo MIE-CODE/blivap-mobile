@@ -49,7 +49,7 @@ export function Carousel<T = ReactElement>({
   height = 200,
   loop = true,
   autoPlay = false,
-  autoPlayInterval = 3000,
+  autoPlayInterval = 6000,
   mode = "default",
   showPagination = true,
   style,

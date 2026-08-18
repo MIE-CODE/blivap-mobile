@@ -4,19 +4,24 @@ import CodeInput from "@/components/code-input";
 import { Spacer } from "@/components/spacer";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { useRouter } from "expo-router";
-import { navigate } from "expo-router/build/global-state/router";
-import { useState } from "react";
+import { Redirect, useRouter } from "expo-router";
+import { Formik } from "formik";
 import { StyleSheet } from "react-native";
+import { otpSchema } from "../../../schemas/auth.schema";
+import { useAppSelector } from "../../../stores/hooks";
 
 export default function VerifyOtp() {
   const theme = useTheme();
-  const [code, setCode] = useState<string>("");
-  const isCodeValid = code.length === 4;
+  const { user, isAuthenticated } = useAppSelector((s) => s.auth);
+  const { verifyOtp, loading } = useAuth();
   const router = useRouter();
+
+  if (!isAuthenticated) return <Redirect href="/login" />;
+
   return (
-    <ThemedView safe>
+    <ThemedView safe style={{ flex: 1 }}>
       <Spacer height={32} />
       <ThemedView
         style={{
@@ -24,7 +29,7 @@ export default function VerifyOtp() {
           justifyContent: "flex-start",
         }}
       >
-        <BackBtn onPress={() => router.back()} />
+        <BackBtn onPress={() => router.push("/login")} />
       </ThemedView>
       <Spacer height={53} />
       <ThemedView style={{ alignItems: "center", justifyContent: "center" }}>
@@ -33,35 +38,69 @@ export default function VerifyOtp() {
           Please enter the code we just send to email
         </ThemedText>
         <ThemedText type="subtitle" style={{ color: theme.link }}>
-          james.john@gmail.com
+          {user?.email}
         </ThemedText>
         <Spacer height={32} />
-        <CodeInput value={code} onCodeChange={setCode} inputCount={4} />
-        <Spacer height={24} />
-        <ThemedText type="subtitle" style={{ color: theme.textSecondary }}>
-          Didn’t receive the OTP?{" "}
-        </ThemedText>
-        <ThemedText
-          style={{
-            color: theme.text,
-            textDecorationLine: "underline",
-            fontSize: 12,
-            fontWeight: 500,
-          }}
+        <Formik
+          initialValues={{ otp: "" }}
+          validationSchema={otpSchema}
+          onSubmit={(val) =>
+            verifyOtp({
+              email: user?.email ?? "",
+              emailValidationToken: val.otp,
+            })
+          }
+          validateOnMount
         >
-          Resend code
-        </ThemedText>
-        <Spacer height={24} />
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleSubmit,
+            isValid,
+            setFieldTouched,
+          }) => (
+            <>
+              <CodeInput
+                value={values.otp}
+                onCodeChange={handleChange("otp")}
+                onBlur={() => setFieldTouched("otp", true)}
+                error={touched.otp && errors.otp}
+                inputCount={6}
+                type="text"
+              />
+              <Spacer height={24} />
+              <ThemedText
+                type="subtitle"
+                style={{ color: theme.textSecondary }}
+              >
+                Didn’t receive the OTP?{" "}
+              </ThemedText>
+              <ThemedText
+                style={{
+                  color: theme.text,
+                  textDecorationLine: "underline",
+                  fontSize: 12,
+                  fontWeight: 500,
+                }}
+              >
+                Resend code
+              </ThemedText>
+              <Spacer height={24} />
+              <Button
+                style={{ width: "100%" }}
+                size="large"
+                onPress={() => handleSubmit()}
+                disabled={!isValid || loading}
+                loading={loading}
+              >
+                Verify
+              </Button>
+            </>
+          )}
+        </Formik>
       </ThemedView>
-
-      <Button
-        size="large"
-        onPress={() => navigate("/login")}
-        disabled={!isCodeValid}
-        variant={isCodeValid ? "primary" : "disabled"}
-      >
-        Verify
-      </Button>
     </ThemedView>
   );
 }

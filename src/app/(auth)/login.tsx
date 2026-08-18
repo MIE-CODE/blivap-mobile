@@ -65,7 +65,7 @@ export default function Login() {
             <Spacer height={10} />
             <ThemedText style={{ textAlign: "right" }}>
               <Link
-                href="/login"
+                href="/forgot-password"
                 style={{
                   color: "#0005F2",
                   textDecorationLine: "underline",

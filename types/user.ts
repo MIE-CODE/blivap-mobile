@@ -1,16 +1,23 @@
 export interface IRegister {
-  fullName: string;
-  phoneNumber: string;
   email: string;
   password: string;
   termsAndCondition: boolean;
   privacyPolicy: boolean;
+  firstname: string;
+  lastname: string;
+  dateOfBirth: string;
+  /** E.164-style value, e.g. `+2348012345678`. */
+  phonenumber: string;
 }
+
 export interface ILogin {
   email: string;
   password: string;
 }
-
+export interface IOtp {
+  emailValidationToken: string;
+  email: string;
+}
 export interface User {
   createdAt: string;
   dateOfBirth: string;

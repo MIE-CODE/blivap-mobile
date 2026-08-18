@@ -35,7 +35,7 @@ export const ThemedInput = ({
   if (!isPassword) {
     return (
       <View>
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
         <Spacer height={4} />
         <TextInput
           placeholder={placeholder}
@@ -43,6 +43,7 @@ export const ThemedInput = ({
             styles.input,
             {
               borderColor: hasError ? theme.status.danger : theme.border,
+              color: theme.text,
             },
           ]}
           value={value}
@@ -59,7 +60,7 @@ export const ThemedInput = ({
   }
   return (
     <View>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
       <Spacer height={4} />
       <View
         style={[
@@ -71,7 +72,12 @@ export const ThemedInput = ({
       >
         <TextInput
           placeholder={placeholder}
-          style={{ paddingVertical: 13.5, paddingRight: 20, flex: 1 }}
+          style={{
+            paddingVertical: 13.5,
+            paddingRight: 20,
+            flex: 1,
+            color: theme.text,
+          }}
           value={value}
           secureTextEntry={!showPassword}
           {...props}

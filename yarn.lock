@@ -585,10 +585,20 @@
   dependencies:
     "@types/hammerjs" "^2.0.36"
 
+"@expo-google-fonts/inter@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/inter/-/inter-0.4.2.tgz#2d37ffb1cb16600cff616b6c4c0efee9b6c47c28"
+  integrity sha512-syfiImMaDmq7cFi0of+waE2M4uSCyd16zgyWxdPOY7fN2VBmSLKEzkfbZgeOjJq61kSqPBNNtXjggiQiSD6gMQ==
+
 "@expo-google-fonts/material-symbols@^0.4.1":
   version "0.4.43"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/material-symbols/-/material-symbols-0.4.43.tgz#d1ec4dffc67364ff1c95986dc055b0be921c9d7c"
   integrity sha512-jJzgVcbkJnl48X5iBFNaL5CQHwoBElJapl8unc2Ri8DnyuBR+gRiuAD4gu3ESZjjo3sknIoYIwloOsWzKbLknQ==
+
+"@expo-google-fonts/poppins@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/poppins/-/poppins-0.4.1.tgz#bf49b2a14a5d255fa3404fdef7bcbbb04025f0a4"
+  integrity sha512-LiX5oEryJqDt3UmWwr4oqf11hGMz/JEffkkNcZ3UtGwyoMFzXmBmTwcrAWrEttxypxmLNmPykDg+CY2VjKve9A==
 
 "@expo/cli@^57.0.14":
   version "57.0.14"
@@ -1212,6 +1222,13 @@
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-use-layout-effect/-/react-use-layout-effect-1.1.4.tgz#51a0bbc342315070983383b3f8f00061083782a8"
   integrity sha512-K20DkRkUwDnxEYMBPcg3Y6voLkEy5p5QQmszZgLngKKiC7dzBR/aEuK3w1qlx2JWDUNH6FluahYdgR3BP+QbYw==
+
+"@react-native-community/datetimepicker@9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-9.1.0.tgz#98359c2107fa900315e123a682a5f56f56d68339"
+  integrity sha512-eadbnk+I2vxvW30iTAsm/qlCnMMAadkifIMYNEB2lzhxN/SvlKc7S2V4k5DyrwjdCbqdcMk3t9K6fnUMcAV34w==
+  dependencies:
+    invariant "^2.2.4"
 
 "@react-native-masked-view/masked-view@^0.3.2":
   version "0.3.2"

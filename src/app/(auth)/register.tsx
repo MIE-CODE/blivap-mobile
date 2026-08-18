@@ -11,12 +11,13 @@ import AppleIcon from "@/assets/icons/apple.svg";
 import FacebookIcon from "@/assets/icons/facebook.svg";
 import GoogleIcon from "@/assets/icons/google.svg";
 import { ThemedCheckbox } from "@/components/themed-checkbox";
+import { ThemedDatePicker } from "@/components/themed-date-picker";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { Formik } from "formik";
 import { RegisterSchema } from "../../../schemas/auth.schema";
 export default function Register() {
-  const { register } = useAuth();
+  const { register, loading } = useAuth();
   const theme = useTheme();
   return (
     <ThemedView safe>
@@ -31,10 +32,12 @@ export default function Register() {
       <Spacer height={24} />
       <Formik
         initialValues={{
-          fullName: "",
-          phoneNumber: "",
+          firstname: "",
+          lastname: "",
+          phonenumber: "",
           email: "",
           password: "",
+          dateOfBirth: "",
           termsAndCondition: false,
           privacyPolicy: false,
         }}
@@ -50,6 +53,7 @@ export default function Register() {
           values,
           isValid,
           setFieldValue,
+          setFieldTouched,
         }) => {
           const hasAcceptedTerms =
             values.privacyPolicy && values.termsAndCondition;
@@ -58,22 +62,31 @@ export default function Register() {
             <>
               <ThemedView style={styles.form}>
                 <ThemedInput
-                  label="Full name"
-                  placeholder="John Doe"
+                  label="Firstname"
+                  placeholder="John"
                   keyboardType="default"
-                  value={values.fullName}
-                  onChangeText={handleChange("fullName")}
+                  value={values.firstname}
+                  onChangeText={handleChange("firstname")}
                   onBlur={handleBlur("fullName")}
-                  error={touched.fullName && errors.fullName}
+                  error={touched.firstname && errors.firstname}
+                />
+                <ThemedInput
+                  label="Lastname"
+                  placeholder="Doe"
+                  keyboardType="default"
+                  value={values.lastname}
+                  onChangeText={handleChange("lastname")}
+                  onBlur={handleBlur("fullName")}
+                  error={touched.lastname && errors.lastname}
                 />
                 <ThemedInput
                   label="Phone number"
                   placeholder="08012345678"
                   keyboardType="phone-pad"
-                  value={values.phoneNumber}
-                  onChangeText={handleChange("phoneNumber")}
+                  value={values.phonenumber}
+                  onChangeText={handleChange("phonenumber")}
                   onBlur={handleBlur("phoneNumber")}
-                  error={touched.phoneNumber && errors.phoneNumber}
+                  error={touched.phonenumber && errors.phonenumber}
                 />
                 <ThemedInput
                   label="Email"
@@ -83,6 +96,14 @@ export default function Register() {
                   onChangeText={handleChange("email")}
                   onBlur={handleBlur("email")}
                   error={touched.email && errors.email}
+                />
+                <ThemedDatePicker
+                  label="Date of birth"
+                  placeholder="Select date of birth"
+                  value={values.dateOfBirth}
+                  onChange={(iso) => setFieldValue("dateOfBirth", iso)}
+                  onBlur={() => setFieldTouched("dateOfBirth", true)}
+                  error={touched.dateOfBirth && errors.dateOfBirth}
                 />
                 <ThemedInput
                   label="Password"
@@ -161,7 +182,8 @@ export default function Register() {
               <Button
                 size="large"
                 onPress={() => handleSubmit()}
-                disabled={!hasAcceptedTerms || !isValid}
+                disabled={loading || !hasAcceptedTerms || !isValid}
+                loading={loading}
               >
                 Sign Up
               </Button>
