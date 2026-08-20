@@ -1,9 +1,4 @@
-import {
-  ScrollView,
-  View,
-  type ScrollViewProps,
-  type ViewProps,
-} from "react-native";
+import { View, type ScrollViewProps, type ViewProps } from "react-native";
 
 import { ThemeColor } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
@@ -27,27 +22,20 @@ export function ThemedView({
 }: ThemedViewProps) {
   const theme = useTheme();
 
-  if (!safe)
-    return (
-      <View
-        style={[{ backgroundColor: theme.background }, style]}
-        {...otherProps}
-      />
-    );
   const insets = useSafeAreaInsets();
-  return (
-    <ScrollView
-      contentContainerStyle={[
+  return safe ? (
+    <View
+      style={[
         {
+          flex: 1,
           paddingHorizontal: 20,
-          backgroundColor: theme.background,
           paddingTop: insets.top,
-          paddingBottom: insets.bottom,
         },
         style,
       ]}
-      showsVerticalScrollIndicator={false}
       {...otherProps}
     />
+  ) : (
+    <View style={style} {...otherProps} />
   );
 }

@@ -6,7 +6,14 @@ import {
   ReactElement,
   useState,
 } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
 
 type TabProps = PropsWithChildren<{
   title: string;
@@ -19,11 +26,13 @@ export function Tab({ children }: TabProps) {
 type TabSwitcherProps = {
   children: ReactElement<TabProps> | ReactElement<TabProps>[];
   initialIndex?: number;
+  triggerStyle?: StyleProp<ViewStyle>;
 };
 
 export default function TabSwitcher({
   children,
   initialIndex = 0,
+  triggerStyle,
 }: TabSwitcherProps) {
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState(initialIndex);
@@ -32,32 +41,34 @@ export default function TabSwitcher({
   ) as ReactElement<TabProps>[];
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.tabBar, { borderColor: theme.primary }]}>
-        {tabs.map((tab, index) => {
-          const isActive = activeTab === index;
+    <View style={[styles.container]}>
+      <View style={triggerStyle}>
+        <View style={[styles.tabBar, { borderColor: theme.primary }]}>
+          {tabs.map((tab, index) => {
+            const isActive = activeTab === index;
 
-          return (
-            <Pressable
-              key={tab.props.title}
-              onPress={() => setActiveTab(index)}
-              style={[
-                styles.tab,
-                isActive && { backgroundColor: theme.primary },
-              ]}
-            >
-              <Text
+            return (
+              <Pressable
+                key={tab.props.title}
+                onPress={() => setActiveTab(index)}
                 style={[
-                  styles.tabText,
-                  { color: theme.text },
-                  isActive && styles.activeTabText,
+                  styles.tab,
+                  isActive && { backgroundColor: theme.primary },
                 ]}
               >
-                {tab.props.title}
-              </Text>
-            </Pressable>
-          );
-        })}
+                <Text
+                  style={[
+                    styles.tabText,
+                    { color: theme.text },
+                    isActive && styles.activeTabText,
+                  ]}
+                >
+                  {tab.props.title}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       <View style={styles.content}>{tabs[activeTab]}</View>

@@ -36,13 +36,16 @@ export const Colors = {
 
   light: {
     text: "#000000",
-    background: "#ffffff",
+    background: "#F9FAFB",
     backgroundElement: "#F0F0F3",
     backgroundSelected: "#E0E1E6",
     textSecondary: "#60646C",
+    textAccent: "#960018",
     border: "#6B7280",
     primary: "#960018",
     link: "#0005F2",
+    shadow: "#000000",
+    skeleton: { base: "#e2e2e2", shimmer: "#f5f5f5" },
   },
   dark: {
     text: "#ffffff",
@@ -50,9 +53,12 @@ export const Colors = {
     backgroundElement: "#212225",
     backgroundSelected: "#2E3135",
     textSecondary: "#B0B4BA",
+    textAccent: "#D64550",
     border: "#6B7280",
     primary: "#960018",
     link: "#0005F2",
+    shadow: "#ffffff",
+    skeleton: { base: "#2a2a2a", shimmer: "#3d3d3d" },
   },
 } as const;
 
