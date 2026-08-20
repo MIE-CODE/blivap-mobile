@@ -9,7 +9,8 @@ import { Spacer } from "./spacer";
 import { ThemedView } from "./themed-view";
 export const TabBar = (props: BottomTabBarProps) => {
   const theme = useTheme();
-  const isActive = (index: number) => props.state.index === index;
+  const currentRoute = props.state.routes[props.state.index]?.name;
+  const isActive = (name: string) => currentRoute === name;
   return (
     <ThemedView
       style={[
@@ -22,14 +23,14 @@ export const TabBar = (props: BottomTabBarProps) => {
         onPress={() => props.navigation.navigate("home")}
       >
         <HomeIcon
-          fill={isActive(0) ? theme.primary : "none"}
-          stroke={isActive(0) ? theme.primary : "none"}
+          fill={isActive("home") ? theme.primary : "none"}
+          stroke={isActive("home") ? theme.primary : "none"}
           strokeWidth={0}
-          color={isActive(0) ? theme.primary : Colors.gray[3]}
+          color={isActive("home") ? theme.primary : Colors.gray[3]}
         />
         <Text
           style={{
-            color: isActive(0) ? theme.primary : theme.border,
+            color: isActive("home") ? theme.primary : theme.border,
 
             fontFamily: Fonts.inter.regular,
             fontSize: 14,
@@ -46,7 +47,7 @@ export const TabBar = (props: BottomTabBarProps) => {
           style={[
             styles.plusIcon,
             {
-              backgroundColor: isActive(1)
+              backgroundColor: isActive("donate")
                 ? theme.primary
                 : theme.textSecondary,
             },
@@ -57,7 +58,7 @@ export const TabBar = (props: BottomTabBarProps) => {
         <Spacer height={4} />
         <Text
           style={{
-            color: isActive(1) ? theme.primary : theme.border,
+            color: isActive("donate") ? theme.primary : theme.border,
             fontFamily: Fonts.inter.regular,
             fontSize: 14,
           }}
@@ -67,20 +68,17 @@ export const TabBar = (props: BottomTabBarProps) => {
       </Pressable>
       <Pressable
         style={styles.btn}
-        onPress={() => {
-          props.navigation.navigate("wallet");
-          console.log(props.navigation);
-        }}
+        onPress={() => props.navigation.navigate("(wallet)")}
       >
         <WalletIcon
-          fill={isActive(2) ? theme.primary : "none"}
-          stroke={isActive(2) ? theme.primary : theme.border}
-          strokeWidth={isActive(2) ? 0 : 1}
-          color={isActive(2) ? theme.primary : Colors.gray[3]}
+          fill={isActive("(wallet)") ? theme.primary : "none"}
+          stroke={isActive("(wallet)") ? theme.primary : theme.border}
+          strokeWidth={isActive("(wallet)") ? 0 : 1}
+          color={isActive("(wallet)") ? theme.primary : Colors.gray[3]}
         />
         <Text
           style={{
-            color: isActive(2) ? theme.primary : theme.border,
+            color: isActive("(wallet)") ? theme.primary : theme.border,
             fontFamily: Fonts.inter.regular,
             fontSize: 14,
           }}

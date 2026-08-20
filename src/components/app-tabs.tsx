@@ -15,7 +15,8 @@ export default function AppTabs() {
     >
       <Tabs.Screen name="home" options={{ title: "Home" }} />
       <Tabs.Screen name="donate" options={{ title: "Donate" }} />
-      <Tabs.Screen name="wallet" options={{ title: "Wallet" }} />
+      <Tabs.Screen name="(wallet)" options={{ title: "Wallet" }} />
+      <Tabs.Screen name="donors" options={{ href: null }} />
     </Tabs>
   );
 }
