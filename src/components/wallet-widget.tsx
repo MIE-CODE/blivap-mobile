@@ -7,6 +7,7 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { Feather, Octicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
 export const WalletWidget = () => {
   const theme = useTheme();
@@ -74,7 +75,7 @@ export const WalletWidget = () => {
           size="small"
           style={{ borderColor: "#FFFFFF33" }}
           icon={<WithdrawIcon width={16} height={16} color={theme.text} />}
-          onPress={() => {}}
+          onPress={() => router.push("/withdraw")}
         >
           <ThemedText style={{ color: "white", fontSize: 12, fontWeight: 400 }}>
             Withdraw
