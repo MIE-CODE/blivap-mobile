@@ -18,8 +18,37 @@ export default function resolved() {
     setValue(items[i]);
     setIsActive(i);
   };
+  const [modalOpen, setModalOpen] = useState(false);
+  const show = () => setModalOpen(true);
+  const hide = () => setModalOpen(false);
+
   return (
     <ThemedView safe style={{ flex: 1 }}>
+      {modalOpen && (
+        <Pressable
+          onPress={hide}
+          style={{
+            backgroundColor: "#00000080",
+            flex: 1,
+            position: "absolute",
+          }}
+        />
+      )}
+      <Modal transparent visible={modalOpen} animationType="slide">
+        <ThemedView
+          style={{
+            height: "40%",
+            marginTop: "auto",
+            backgroundColor: "white",
+            borderRadius: 20,
+            paddingVertical: 16,
+            paddingHorizontal: 36,
+          }}
+        >
+          <ThemedText>Hello</ThemedText>
+        </ThemedView>
+      </Modal>
+
       <ThemedView
         style={{
           flexDirection: "row",
@@ -118,8 +147,10 @@ export default function resolved() {
           ))}
         </ThemedView>
       </ThemedView>
-      <Modal visible style={{ maxHeight: 10 }} animationType="slide"></Modal>
-      <Button style={{ marginTop: "auto" }}>Confirm</Button>
+
+      <Button style={{ marginTop: "auto" }} onPress={show}>
+        Confirm
+      </Button>
     </ThemedView>
   );
 }

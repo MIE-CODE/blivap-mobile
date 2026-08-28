@@ -6,7 +6,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { Redirect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import { StyleSheet } from "react-native";
 import { otpSchema } from "../../../schemas/auth.schema";
@@ -14,11 +14,9 @@ import { useAppSelector } from "../../../stores/hooks";
 
 export default function VerifyOtp() {
   const theme = useTheme();
-  const { user, isAuthenticated } = useAppSelector((s) => s.auth);
+  const { user } = useAppSelector((s) => s.auth);
   const { verifyOtp, loading } = useAuth();
   const router = useRouter();
-
-  if (!isAuthenticated) return <Redirect href="/login" />;
 
   return (
     <ThemedView safe style={{ flex: 1 }}>

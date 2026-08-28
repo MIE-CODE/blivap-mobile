@@ -1,12 +1,15 @@
-import AppTabs from "@/components/app-tabs";
-import { Redirect } from "expo-router";
-import { useAppSelector } from "../../../stores/hooks";
+import { useTheme } from "@/hooks/use-theme";
+import { Stack } from "expo-router";
 
-export default function TabLayout() {
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+export default function DashboardLayout() {
+  const theme = useTheme();
 
-  if (!isAuthenticated) return <Redirect href="/login" />;
-  if (!user?.emailVerified) return <Redirect href="/verify-otp" />;
-  if (!user?.profileImage) return <Redirect href="/avatar" />;
-  return <AppTabs />;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: theme.background },
+      }}
+    />
+  );
 }

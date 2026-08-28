@@ -9,7 +9,7 @@ import { useDonors } from "@/hooks/use-donors";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { ScrollView } from "react-native";
-import { useAppSelector } from "../../../../stores/hooks";
+import { useAppSelector } from "../../../../../stores/hooks";
 
 export default function Donors() {
   const router = useRouter();

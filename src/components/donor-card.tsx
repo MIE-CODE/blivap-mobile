@@ -1,7 +1,9 @@
 import { useTheme } from "@/hooks/use-theme";
 import { SimpleLineIcons } from "@expo/vector-icons";
+import { useState } from "react";
 import { StyleSheet } from "react-native";
 import { Donor } from "../../types/donor";
+import { RequestBloodDonationModal } from "@/components/ui/donors/request-blood-donation-modal";
 import { Button } from "./button";
 import { Spacer } from "./spacer";
 import { ThemedIcon } from "./themed-icon";
@@ -15,6 +17,7 @@ interface Card {
 }
 export const DonorCard = ({ data, skeleton }: Card) => {
   const theme = useTheme();
+  const [requestModalVisible, setRequestModalVisible] = useState(false);
 
   return skeleton ? (
     <ThemedView
@@ -64,12 +67,13 @@ export const DonorCard = ({ data, skeleton }: Card) => {
       <Skeleton height={35} />
     </ThemedView>
   ) : (
-    <ThemedView
-      style={[
-        styles.card,
-        { shadowColor: theme.text, backgroundColor: theme.background },
-      ]}
-    >
+    <>
+      <ThemedView
+        style={[
+          styles.card,
+          { shadowColor: theme.text, backgroundColor: theme.background },
+        ]}
+      >
       <ThemedView
         style={{
           flex: 1,
@@ -151,10 +155,18 @@ export const DonorCard = ({ data, skeleton }: Card) => {
           fontSize: 14,
           fontWeight: 500,
         }}
+        onPress={() => setRequestModalVisible(true)}
       >
         Request Donation
       </Button>
-    </ThemedView>
+      </ThemedView>
+
+      <RequestBloodDonationModal
+        visible={requestModalVisible}
+        donor={data}
+        onClose={() => setRequestModalVisible(false)}
+      />
+    </>
   );
 };
 

@@ -7,13 +7,12 @@ import { BloodDonorTab } from "@/components/ui/home/blood-donor-tab";
 import { WalletWidget } from "@/components/wallet-widget";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { Image, Pressable, ScrollView } from "react-native";
-import { useAppSelector } from "../../../stores/hooks";
+import { useAppSelector } from "../../../../stores/hooks";
 export default function Home() {
   const { user } = useAppSelector((s) => s.auth);
   const theme = useTheme();
-  const router = useRouter();
   return (
     <ThemedView
       safe
@@ -31,7 +30,7 @@ export default function Home() {
         <ThemedView
           style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
         >
-          <Pressable onPress={() => router.push("/settings")}>
+          <Pressable onPress={() => router.push("/profile")}>
             <Image
               source={{ uri: user?.profileImage ?? "" }}
               style={{
@@ -56,7 +55,7 @@ export default function Home() {
             borderColor: theme.primary,
             borderRadius: 100,
           }}
-          onPress={() => {}}
+          onPress={() => router.push("/notification")}
         >
           <NotificationsIcon color={theme.text} />
         </Pressable>

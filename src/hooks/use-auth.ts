@@ -1,8 +1,11 @@
+import { getPostAuthRoute } from "@/utils/auth-routes";
 import { useRouter } from "expo-router";
 
 import { useState } from "react";
 import Toast from "react-native-toast-message";
 import { $api } from "../../services/api-client";
+import { clearAuthToken, saveAuthToken } from "../../services/auth-storage";
+import { redirectToLogin } from "../../services/navigation";
 import { logout, setCredentials, updateUser } from "../../stores/auth.slice";
 import { useAppDispatch } from "../../stores/hooks";
 import { ILogin, IOtp, IRegister } from "../../types/user";
@@ -16,11 +19,10 @@ export const useAuth = () => {
   const verifyOtp = async (payload: IOtp) => {
     try {
       setLoading(true);
-      const res = await $api.auth.verifyOtp(payload);
-      const message = res.message;
+      await $api.auth.verifyOtp(payload);
       Toast.show({ type: "success", text1: "Email Verified" });
       dispatch(updateUser({ emailVerified: true }));
-      router.replace("/home");
+      router.replace("/avatar");
     } catch (e) {
       Toast.show({
         type: "error",
@@ -36,9 +38,10 @@ export const useAuth = () => {
       setLoading(true);
       const res = await $api.auth.login(payload);
       const { user, accessToken: token } = res.data;
-      Toast.show({ type: "success", text1: "Signed In" });
+      await saveAuthToken(token);
       dispatch(setCredentials({ user, token }));
-      router.replace("/home");
+      Toast.show({ type: "success", text1: "Signed In" });
+      router.replace(getPostAuthRoute(user));
     } catch (e) {
       Toast.show({
         type: "error",
@@ -48,10 +51,12 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
+
   const me = async (token: string) => {
     try {
       const res = await $api.auth.me();
       const user = res.data;
+      await saveAuthToken(token);
       dispatch(setCredentials({ user, token }));
     } catch (e) {
       Toast.show({
@@ -76,10 +81,10 @@ export const useAuth = () => {
         dateOfBirth,
       });
       const { user, accessToken: token } = res.data;
-      Toast.show({ type: "success", text1: "Registered" });
+      await saveAuthToken(token);
       dispatch(setCredentials({ user, token }));
+      Toast.show({ type: "success", text1: "Registered" });
       router.replace("/verify-otp");
-      setLoading(false);
     } catch (e) {
       Toast.show({
         type: "error",
@@ -90,12 +95,14 @@ export const useAuth = () => {
     }
   };
 
-  const logOut = () => {
+  const logOut = async () => {
+    await clearAuthToken();
     dispatch(logout());
     Toast.show({
       type: "success",
       text1: "Logged out",
     });
+    redirectToLogin();
   };
 
   return { register, login, verifyOtp, me, logOut, loading };

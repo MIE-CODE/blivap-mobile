@@ -86,6 +86,7 @@ export const WalletWidget = () => {
           size="small"
           style={{ borderColor: "#FFFFFF33" }}
           icon={<PlusIcon width={16} height={16} />}
+          onPress={() => router.push("/add-money")}
         >
           <ThemedText style={{ color: "white", fontSize: 12, fontWeight: 400 }}>
             Add Money
