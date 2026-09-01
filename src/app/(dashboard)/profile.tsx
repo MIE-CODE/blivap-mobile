@@ -7,23 +7,46 @@ import { MembershipPassCard } from "@/components/ui/profile/membership-pass-card
 import { ProfileSettingsItem } from "@/components/ui/profile/profile-settings-item";
 import { ProfileStatCard } from "@/components/ui/profile/profile-stat-card";
 import { Fonts } from "@/constants/theme";
-import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
+import { router } from "expo-router";
 import { Image, ScrollView, StyleSheet } from "react-native";
 import { useAppSelector } from "../../../stores/hooks";
 
 const SETTINGS_ITEMS = [
-  { label: "Personal Information", icon: "user" as const },
-  { label: "Bank Details", icon: "credit-card" as const },
-  { label: "Donation History", icon: "clock" as const },
-  { label: "Notification Settings", icon: "bell" as const },
-  { label: "Privacy & Security", icon: "shield" as const },
-  { label: "Help & Support", icon: "help-circle" as const },
+  {
+    label: "Personal Information",
+    icon: "user" as const,
+    href: "/settings/personal-information",
+  },
+  {
+    label: "Bank Details",
+    icon: "credit-card" as const,
+    href: "/settings/bank-details",
+  },
+  {
+    label: "Donation History",
+    icon: "clock" as const,
+    href: "/settings/donation-history",
+  },
+  {
+    label: "Notification Settings",
+    icon: "bell" as const,
+    href: "/settings/notifications",
+  },
+  {
+    label: "Privacy & Security",
+    icon: "shield" as const,
+    href: "/settings/privacy-security",
+  },
+  {
+    label: "Help & Support",
+    icon: "help-circle" as const,
+    href: "/settings/help-support",
+  },
 ];
 
 export default function Profile() {
   const { user } = useAppSelector((s) => s.auth);
-  const { logOut } = useAuth();
   const theme = useTheme();
 
   const displayName = user?.firstname ?? "Will";
@@ -86,7 +109,7 @@ export default function Profile() {
                 label={item.label}
                 icon={item.icon}
                 showDivider={index < SETTINGS_ITEMS.length - 1}
-                onPress={() => {}}
+                onPress={() => router.push(item.href)}
               />
             ))}
           </ThemedView>
@@ -95,7 +118,7 @@ export default function Profile() {
         <Button
           variant="outline"
           size="large"
-          onPress={logOut}
+          onPress={() => router.push("/settings/logout")}
           style={{
             borderColor: theme.primary,
             backgroundColor: "transparent",

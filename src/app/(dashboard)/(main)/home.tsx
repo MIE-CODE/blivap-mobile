@@ -3,9 +3,11 @@ import { Spacer } from "@/components/spacer";
 import TabSwitcher, { Tab } from "@/components/tab";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { ProductBriefingModal } from "@/components/ui/briefing/product-briefing-modal";
 import { BloodDonorTab } from "@/components/ui/home/blood-donor-tab";
 import { WalletWidget } from "@/components/wallet-widget";
 import { Fonts } from "@/constants/theme";
+import { useProductBriefing } from "@/hooks/use-product-briefing";
 import { useTheme } from "@/hooks/use-theme";
 import { router } from "expo-router";
 import { Image, Pressable, ScrollView } from "react-native";
@@ -13,6 +15,8 @@ import { useAppSelector } from "../../../../stores/hooks";
 export default function Home() {
   const { user } = useAppSelector((s) => s.auth);
   const theme = useTheme();
+  const { visible: showBriefing, dismissBriefing } = useProductBriefing();
+
   return (
     <ThemedView
       safe
@@ -80,6 +84,11 @@ export default function Home() {
           </Tab>
         </TabSwitcher>
       </ScrollView>
+
+      <ProductBriefingModal
+        visible={showBriefing}
+        onDismiss={dismissBriefing}
+      />
     </ThemedView>
   );
 }

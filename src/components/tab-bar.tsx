@@ -3,14 +3,23 @@ import PlusIcon from "@/assets/icons/plus.svg";
 import WalletIcon from "@/assets/icons/wallet.svg";
 import { Colors, Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { isDonor } from "@/utils/user-roles";
 import { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs";
 import { Pressable, StyleSheet, Text } from "react-native";
+import { useAppSelector } from "../../stores/hooks";
 import { Spacer } from "./spacer";
 import { ThemedView } from "./themed-view";
 export const TabBar = (props: BottomTabBarProps) => {
   const theme = useTheme();
+  const { user } = useAppSelector((s) => s.auth);
   const currentRoute = props.state.routes[props.state.index]?.name;
   const isActive = (name: string) => currentRoute === name;
+  const hideOnDonateTab = currentRoute === "donate" && !isDonor(user?.roles);
+
+  if (hideOnDonateTab) {
+    return null;
+  }
+
   return (
     <ThemedView
       style={[

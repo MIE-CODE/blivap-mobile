@@ -4,6 +4,7 @@ import { Spacer } from "@/components/spacer";
 import { ThemedIcon } from "@/components/themed-icon";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { Fonts } from "@/constants/theme";
 import { useDonors } from "@/hooks/use-donors";
 import { useTheme } from "@/hooks/use-theme";
 import { Link } from "expo-router";
@@ -45,15 +46,30 @@ export const BloodDonorTab = () => {
             }}
           >
             <ThemedView>
-              <ThemedText style={{ fontSize: 20, fontWeight: 400 }}>
+              <ThemedText
+                style={{ fontSize: 12, fontFamily: Fonts.poppins.regular }}
+              >
                 o+ Blood
               </ThemedText>
-              <ThemedText type="xSmall" style={{ color: theme.border }}>
+              <ThemedText
+                type="xSmall"
+                style={{
+                  fontSize: 12,
+                  fontFamily: Fonts.poppins.regular,
+                  color: theme.textSecondary,
+                }}
+              >
                 2 pack
               </ThemedText>
             </ThemedView>
             <ThemedView>
-              <ThemedText style={{ fontSize: 20, fontWeight: 400 }}>
+              <ThemedText
+                style={{
+                  fontSize: 16,
+                  fontFamily: Fonts.poppins.medium,
+                  color: theme.text,
+                }}
+              >
                 ₦ 100,000
               </ThemedText>
               <ThemedView
@@ -67,7 +83,10 @@ export const BloodDonorTab = () => {
                     backgroundColor: theme.status.success,
                   }}
                 />
-                <ThemedText type="xSmall" style={{ color: theme.border }}>
+                <ThemedText
+                  type="xSmall"
+                  style={{ color: theme.textSecondary }}
+                >
                   Completed
                 </ThemedText>
               </ThemedView>

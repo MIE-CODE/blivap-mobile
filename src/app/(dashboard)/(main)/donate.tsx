@@ -1,15 +1,14 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { DonateOptionsScreen } from "@/components/ui/donate/donate-options-screen";
+import { MyDonationsScreen } from "@/components/ui/donate/my-donations-screen";
+import { isDonor } from "@/utils/user-roles";
+import { useAppSelector } from "../../../../stores/hooks";
 
 export default function DonatePage() {
-  return (
-    <ThemedView>
-      <SafeAreaView>
-        <ThemedView>
-          <ThemedText type="title">Donate</ThemedText>
-        </ThemedView>
-      </SafeAreaView>
-    </ThemedView>
-  );
+  const { user } = useAppSelector((s) => s.auth);
+
+  if (isDonor(user?.roles)) {
+    return <MyDonationsScreen />;
+  }
+
+  return <DonateOptionsScreen />;
 }
