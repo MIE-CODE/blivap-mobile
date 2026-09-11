@@ -1,32 +1,48 @@
 import HomeIcon from "@/assets/icons/home.svg";
 import PlusIcon from "@/assets/icons/plus.svg";
 import WalletIcon from "@/assets/icons/wallet.svg";
-import { Colors } from "@/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { isDonor } from "@/utils/user-roles";
 import { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs";
 import { Pressable, StyleSheet, Text } from "react-native";
+import { useAppSelector } from "../../stores/hooks";
 import { Spacer } from "./spacer";
 import { ThemedView } from "./themed-view";
 export const TabBar = (props: BottomTabBarProps) => {
   const theme = useTheme();
-  const isActive = (index: number) => props.state.index === index;
+  const { user } = useAppSelector((s) => s.auth);
+  const currentRoute = props.state.routes[props.state.index]?.name;
+  const isActive = (name: string) => currentRoute === name;
+  const hideOnDonateTab = currentRoute === "donate" && !isDonor(user?.roles);
+
+  if (hideOnDonateTab) {
+    return null;
+  }
+
   return (
-    <ThemedView style={[styles.container, { shadowColor: theme.text }]}>
+    <ThemedView
+      style={[
+        styles.container,
+        { shadowColor: theme.text, backgroundColor: theme.background },
+      ]}
+    >
       <Pressable
         style={styles.btn}
         onPress={() => props.navigation.navigate("home")}
       >
         <HomeIcon
-          fill={isActive(0) ? theme.primary : "none"}
-          stroke={isActive(0) ? theme.primary : "none"}
+          fill={isActive("home") ? theme.primary : "none"}
+          stroke={isActive("home") ? theme.primary : "none"}
           strokeWidth={0}
-          color={isActive(0) ? theme.primary : Colors.gray[3]}
+          color={isActive("home") ? theme.primary : Colors.gray[3]}
         />
         <Text
           style={{
-            color: isActive(0) ? theme.primary : theme.border,
-            fontSize: 12,
-            fontWeight: 400,
+            color: isActive("home") ? theme.primary : theme.border,
+
+            fontFamily: Fonts.inter.regular,
+            fontSize: 14,
           }}
         >
           Home
@@ -40,7 +56,7 @@ export const TabBar = (props: BottomTabBarProps) => {
           style={[
             styles.plusIcon,
             {
-              backgroundColor: isActive(1)
+              backgroundColor: isActive("donate")
                 ? theme.primary
                 : theme.textSecondary,
             },
@@ -49,21 +65,33 @@ export const TabBar = (props: BottomTabBarProps) => {
           <PlusIcon width={32} height={32} color={theme.text} />
         </ThemedView>
         <Spacer height={4} />
-        <Text style={{ color: isActive(1) ? theme.primary : theme.border }}>
+        <Text
+          style={{
+            color: isActive("donate") ? theme.primary : theme.border,
+            fontFamily: Fonts.inter.regular,
+            fontSize: 14,
+          }}
+        >
           Donate
         </Text>
       </Pressable>
       <Pressable
         style={styles.btn}
-        onPress={() => props.navigation.navigate("wallet")}
+        onPress={() => props.navigation.navigate("(wallet)")}
       >
         <WalletIcon
-          fill={isActive(2) ? theme.primary : "none"}
-          stroke={isActive(2) ? theme.primary : theme.border}
-          strokeWidth={1}
-          color={isActive(2) ? theme.primary : Colors.gray[3]}
+          fill={isActive("(wallet)") ? theme.primary : "none"}
+          stroke={isActive("(wallet)") ? theme.primary : theme.border}
+          strokeWidth={isActive("(wallet)") ? 0 : 1}
+          color={isActive("(wallet)") ? theme.primary : Colors.gray[3]}
         />
-        <Text style={{ color: isActive(2) ? theme.primary : theme.border }}>
+        <Text
+          style={{
+            color: isActive("(wallet)") ? theme.primary : theme.border,
+            fontFamily: Fonts.inter.regular,
+            fontSize: 14,
+          }}
+        >
           Wallet
         </Text>
       </Pressable>

@@ -1,5 +1,6 @@
 import { store } from "@/../stores";
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
+import { AuthProvider } from "@/components/auth-provider";
 import { useTheme } from "@/hooks/use-theme";
 import {
   Inter_400Regular,
@@ -46,12 +47,14 @@ export default function RootLayout() {
       <GestureHandlerRootView
         style={{ flex: 1, backgroundColor: theme.background }}
       >
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: theme.background },
-          }}
-        />
+        <AuthProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: theme.background },
+            }}
+          />
+        </AuthProvider>
         <AnimatedSplashOverlay />
         <Toast />
       </GestureHandlerRootView>

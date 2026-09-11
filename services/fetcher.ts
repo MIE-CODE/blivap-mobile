@@ -2,6 +2,9 @@ import { store } from "@/../stores";
 import { logout } from "@/../stores/auth.slice";
 import { config } from "@/constants/env";
 import Toast from "react-native-toast-message";
+import { clearAuthToken } from "./auth-storage";
+import { redirectToLogin } from "./navigation";
+
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -28,13 +31,14 @@ export const api = async <T = unknown>(
   if (!res.ok) {
     const errorBody = await res.json().catch(() => null);
 
-    // token expired/invalid — force logout everywhere, no need to repeat this per-screen
     if (res.status === 401) {
+      await clearAuthToken();
       store.dispatch(logout());
       Toast.show({
         type: "error",
         text1: "Session expired, please sign in again",
       });
+      redirectToLogin();
     }
 
     throw new ApiError(

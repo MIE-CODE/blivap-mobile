@@ -1,17 +1,25 @@
 import BloodIcon from "@/assets/icons/blood.svg";
-import { Button } from "@/components/button";
+import { DonorCard } from "@/components/donor-card";
 import { Spacer } from "@/components/spacer";
+import { ThemedIcon } from "@/components/themed-icon";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { Fonts } from "@/constants/theme";
+import { useDonors } from "@/hooks/use-donors";
 import { useTheme } from "@/hooks/use-theme";
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
+import { useAppSelector } from "../../../../stores/hooks";
 export const BloodDonorTab = () => {
+  const { donors } = useAppSelector((s) => s.donors);
+  const { loading } = useDonors();
+
   const theme = useTheme();
   return (
     <ThemedView style={{ gap: 8, backgroundColor: "transparent" }}>
       <ThemedText>Recent blood donors</ThemedText>
       <Spacer height={8} />
+
       {[...Array(3)].map((_, index) => (
         <ThemedView
           key={index}
@@ -19,6 +27,7 @@ export const BloodDonorTab = () => {
             styles.card,
             {
               shadowColor: theme.text,
+              backgroundColor: theme.background,
               flexDirection: "row",
               alignItems: "center",
               gap: 13,
@@ -37,15 +46,30 @@ export const BloodDonorTab = () => {
             }}
           >
             <ThemedView>
-              <ThemedText style={{ fontSize: 20, fontWeight: 400 }}>
+              <ThemedText
+                style={{ fontSize: 12, fontFamily: Fonts.poppins.regular }}
+              >
                 o+ Blood
               </ThemedText>
-              <ThemedText type="xSmall" style={{ color: theme.border }}>
+              <ThemedText
+                type="xSmall"
+                style={{
+                  fontSize: 12,
+                  fontFamily: Fonts.poppins.regular,
+                  color: theme.textSecondary,
+                }}
+              >
                 2 pack
               </ThemedText>
             </ThemedView>
             <ThemedView>
-              <ThemedText style={{ fontSize: 20, fontWeight: 400 }}>
+              <ThemedText
+                style={{
+                  fontSize: 16,
+                  fontFamily: Fonts.poppins.medium,
+                  color: theme.text,
+                }}
+              >
                 ₦ 100,000
               </ThemedText>
               <ThemedView
@@ -59,7 +83,10 @@ export const BloodDonorTab = () => {
                     backgroundColor: theme.status.success,
                   }}
                 />
-                <ThemedText type="xSmall" style={{ color: theme.border }}>
+                <ThemedText
+                  type="xSmall"
+                  style={{ color: theme.textSecondary }}
+                >
                   Completed
                 </ThemedText>
               </ThemedView>
@@ -77,72 +104,22 @@ export const BloodDonorTab = () => {
       >
         <ThemedText>Available Donors</ThemedText>
         <ThemedText type="smallBold" style={{ color: theme.primary }}>
-          <Link href="/donors/donors">View All</Link>
+          <Link href="/donors">View All</Link>
         </ThemedText>
       </ThemedView>
       <Spacer height={8} />
-      <ThemedView style={styles.card}>
-        <ThemedView
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
-        >
-          <ThemedText>John Doe</ThemedText>
 
-          <ThemedView
-            style={{
-              paddingVertical: 1,
-              paddingHorizontal: 5,
-              borderRadius: 12,
-              backgroundColor: "#FFE2E2",
-            }}
-          >
-            <ThemedText type="xSmall">O+</ThemedText>
-          </ThemedView>
+      {loading &&
+        [...Array(4)].map((_, index) => <DonorCard key={index} skeleton />)}
+      {!donors?.length ? (
+        <ThemedView style={{ alignItems: "center", marginTop: 50 }}>
+          <ThemedIcon name="cloud-offline-outline" size={60} />
         </ThemedView>
-        <ThemedView
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
-        >
-          <ThemedView
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 16,
-              backgroundColor: "transparent",
-            }}
-          >
-            <ThemedText type="xSmallMedium">4.8</ThemedText>
-            <ThemedText type="xSmallMedium">4 donations</ThemedText>
-          </ThemedView>
-
-          <ThemedText type="xSmallMedium">₦ 150,000 per unit</ThemedText>
-        </ThemedView>
-        <ThemedText type="xSmall" style={{ color: theme.border }}>
-          Lagos, Nigeria
-        </ThemedText>
-        <Spacer height={8} />
-        <Button
-          style={{
-            borderRadius: 10,
-            paddingVertical: 10,
-            paddingHorizontal: 20,
-          }}
-          textStyle={{
-            fontSize: 14,
-            fontWeight: 500,
-          }}
-        >
-          Request Donation
-        </Button>
-      </ThemedView>
+      ) : (
+        donors
+          ?.slice(0, 6)
+          .map((donor) => <DonorCard key={donor.id} data={donor} />)
+      )}
     </ThemedView>
   );
 };

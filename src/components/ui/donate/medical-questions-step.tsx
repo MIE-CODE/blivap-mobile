@@ -1,0 +1,126 @@
+import { Spacer } from "@/components/spacer";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { ConfidentialityNote } from "@/components/ui/donate/confidentiality-note";
+import { MedicalQuestionRow } from "@/components/ui/donate/medical-question-row";
+import { YesNoAnswer } from "@/components/ui/donate/yes-no-radio-group";
+import { Fonts } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
+import { useEffect, useMemo, useState } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+
+const MEDICAL_QUESTIONS = [
+  { id: "gender", question: "What is your gender?" },
+  { id: "age", question: "Are you between 18 and 64 years old?" },
+  { id: "weight", question: "Do you weigh less than 50 kg?" },
+  { id: "transplant", question: "Have you ever had an organ or tissue transplant?" },
+  { id: "drugs", question: "Have you ever injected drugs or doping?" },
+  { id: "diabetes", question: "Do you have diabetes?" },
+  { id: "transfusion", question: "Have you had products or a blood transfusion?" },
+] as const;
+
+type Answers = Record<(typeof MEDICAL_QUESTIONS)[number]["id"], YesNoAnswer>;
+
+const INITIAL_ANSWERS: Answers = {
+  gender: null,
+  age: null,
+  weight: null,
+  transplant: null,
+  drugs: null,
+  diabetes: null,
+  transfusion: null,
+};
+
+type MedicalQuestionsStepProps = {
+  onValidityChange: (isValid: boolean) => void;
+};
+
+export function MedicalQuestionsStep({
+  onValidityChange,
+}: MedicalQuestionsStepProps) {
+  const theme = useTheme();
+  const [answers, setAnswers] = useState<Answers>(INITIAL_ANSWERS);
+
+  const allAnswered = useMemo(
+    () => MEDICAL_QUESTIONS.every((item) => answers[item.id] !== null),
+    [answers],
+  );
+
+  useEffect(() => {
+    onValidityChange(allAnswered);
+  }, [allAnswered, onValidityChange]);
+
+  const handleAnswerChange = (id: keyof Answers, value: YesNoAnswer) => {
+    setAnswers((current) => ({ ...current, [id]: value }));
+  };
+
+  return (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <ThemedText style={styles.heading}>Medical questions</ThemedText>
+      <ThemedText style={[styles.intro, { color: theme.textSecondary }]}>
+        Before you can become a blood donor, we'll ask you a few medical
+        questions to ensure it's safe for you and the recipient.
+      </ThemedText>
+
+      <Spacer height={16} />
+      <ConfidentialityNote />
+      <Spacer height={20} />
+
+      <ThemedView style={[styles.questionnaireCard, { shadowColor: theme.text }]}>
+        <ThemedText style={styles.cardTitle}>
+          Please complete the questions
+        </ThemedText>
+
+        <ThemedView style={styles.questions}>
+          {MEDICAL_QUESTIONS.map((item, index) => (
+            <MedicalQuestionRow
+              key={item.id}
+              question={item.question}
+              value={answers[item.id]}
+              onChange={(value) => handleAnswerChange(item.id, value)}
+              showDivider={index < MEDICAL_QUESTIONS.length - 1}
+            />
+          ))}
+        </ThemedView>
+      </ThemedView>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    paddingBottom: 16,
+  },
+  heading: {
+    fontFamily: Fonts.inter.bold,
+    fontSize: 22,
+    lineHeight: 28,
+  },
+  intro: {
+    marginTop: 8,
+    fontFamily: Fonts.inter.regular,
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  questionnaireCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    padding: 16,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardTitle: {
+    fontFamily: Fonts.inter.semiBold,
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  questions: {
+    gap: 16,
+    backgroundColor: "transparent",
+  },
+});

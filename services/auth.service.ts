@@ -1,5 +1,5 @@
 import { IAuthResponse, IResponse } from "../types/api-response";
-import { ILogin, IOtp, IRegister } from "../types/user";
+import { ILogin, IOtp, IRegister, IUpdateUser } from "../types/user";
 import { api } from "./fetcher";
 
 export default () => {
@@ -26,6 +26,14 @@ export default () => {
     },
     async me(): Promise<IResponse<IAuthResponse["user"]>> {
       return await api("/authentication/me", { method: "GET" });
+    },
+    async update(
+      payload: IUpdateUser,
+    ): Promise<IResponse<IAuthResponse["user"]>> {
+      return await api("/authentication/me", {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
     },
   };
 };

@@ -37,8 +37,17 @@ function walk(dir) {
       "nonisolated(unsafe) weak var runtime:",
     );
 
-    // C++ interop makes `abs` ambiguous with Swift.abs on older toolchains.
-    next = next.replace(/\babs\(milliseconds\)/g, "Swift.abs(milliseconds)");
+    // C++ interop makes `abs` ambiguous on older toolchains. Use `.magnitude`
+    // (no overload resolution). Also fix a bad double-patch (Swift.Swift.abs).
+    next = next.replace(
+      /Swift\.Swift\.abs\(milliseconds\)/g,
+      "milliseconds.magnitude",
+    );
+    next = next.replace(
+      /Swift\.abs\(milliseconds\)/g,
+      "milliseconds.magnitude",
+    );
+    next = next.replace(/\babs\(milliseconds\)/g, "milliseconds.magnitude");
 
     if (next !== src) {
       fs.writeFileSync(full, next);

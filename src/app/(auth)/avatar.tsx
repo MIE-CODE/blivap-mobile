@@ -29,15 +29,11 @@ export default function Avatar() {
       </ThemedText>
       <Spacer height={64} />
       <ThemedView style={styles.avatarContainer}>
-        {!avatars?.length ? (
-          <>
-            {[...Array(12)].map((_, index) => (
+        {!avatars?.length
+          ? [...Array(12)].map((_, index) => (
               <ThemedView key={index} style={[styles.avatar]}></ThemedView>
-            ))}
-          </>
-        ) : (
-          <>
-            {avatars?.map((avatar, index) => (
+            ))
+          : avatars?.map((avatar, index) => (
               <Pressable
                 key={index}
                 style={[
@@ -53,8 +49,6 @@ export default function Avatar() {
                 />
               </Pressable>
             ))}
-          </>
-        )}
       </ThemedView>
       <Spacer height={36} />
       <Button

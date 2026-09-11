@@ -1,5 +1,5 @@
-import EyeOffIcon from "@/assets/icons/eye-off.svg";
 import { useTheme } from "@/hooks/use-theme";
+import { Octicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   KeyboardTypeOptions,
@@ -83,7 +83,11 @@ export const ThemedInput = ({
           {...props}
         />
         <Pressable onPress={() => setShowPassword((prev) => !prev)}>
-          {showPassword ? <EyeOffIcon /> : <EyeOffIcon />}
+          <Octicons
+            name={showPassword ? "eye" : "eye-closed"}
+            size={22}
+            color={theme.textSecondary}
+          />
         </Pressable>
       </View>
       {error && (

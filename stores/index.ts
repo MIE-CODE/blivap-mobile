@@ -1,10 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./auth.slice";
 import avatarReducer from "./avatar.slice";
+import donorsReducer from "./donors.slice";
+import onboardingReducer from "./onboarding.slice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     avatar: avatarReducer,
+    donors: donorsReducer,
+    onboarding: onboardingReducer,
   },
 });
 
