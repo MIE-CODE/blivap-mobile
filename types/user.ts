@@ -42,3 +42,7 @@ export interface IUpdateUser {
   email?: string;
   phonenumber?: string;
 }
+
+export interface IVerifyNin {
+  nin: string;
+}

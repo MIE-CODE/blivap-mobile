@@ -19,6 +19,7 @@ interface ThemedInputProps {
   error?: string | boolean;
   isPassword?: boolean;
   keyboardType?: KeyboardTypeOptions;
+  disabled?: boolean;
 }
 export const ThemedInput = ({
   placeholder,
@@ -27,6 +28,7 @@ export const ThemedInput = ({
   isPassword = false,
   keyboardType,
   error,
+  disabled = false,
   ...props
 }: ThemedInputProps & TextInputProps) => {
   const theme = useTheme();
@@ -44,10 +46,15 @@ export const ThemedInput = ({
             {
               borderColor: hasError ? theme.status.danger : theme.border,
               color: theme.text,
+              backgroundColor: disabled
+                ? theme.backgroundElement
+                : "transparent",
+              opacity: disabled ? 0.85 : 1,
             },
           ]}
           value={value}
           secureTextEntry={showPassword}
+          editable={!disabled}
           {...props}
         />
         {error && (
