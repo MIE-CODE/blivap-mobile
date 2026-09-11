@@ -49,7 +49,8 @@ export default function Profile() {
   const { user } = useAppSelector((s) => s.auth);
   const theme = useTheme();
 
-  const displayName = user?.firstname ?? "Will";
+  const displayName =
+    [user?.firstname, user?.lastname].filter(Boolean).join(" ") || "Will";
   const displayEmail = user?.email ?? "will.iam@donation.com";
 
   return (

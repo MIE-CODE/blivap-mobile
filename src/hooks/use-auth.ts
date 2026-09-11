@@ -1,4 +1,5 @@
 import { getPostAuthRoute } from "@/utils/auth-routes";
+import { toE164Phone } from "@/utils/phone";
 import { useRouter } from "expo-router";
 
 import { useState } from "react";
@@ -75,7 +76,7 @@ export const useAuth = () => {
       const res = await $api.auth.register({
         firstname,
         lastname,
-        phonenumber: `+234${phonenumber}`,
+        phonenumber: toE164Phone(phonenumber),
         email,
         password,
         dateOfBirth,

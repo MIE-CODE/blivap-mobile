@@ -27,6 +27,7 @@ interface ThemedDatePickerProps {
   minimumDate?: Date;
   onChange?: (isoDate: string) => void;
   onBlur?: () => void;
+  disabled?: boolean;
 }
 
 function parseIsoDate(value?: string | null): Date | null {
@@ -67,6 +68,7 @@ export const ThemedDatePicker = ({
   minimumDate,
   onChange,
   onBlur,
+  disabled = false,
 }: ThemedDatePickerProps) => {
   const theme = useTheme();
   const colorScheme = useColorScheme();
@@ -116,11 +118,16 @@ export const ThemedDatePicker = ({
       ) : null}
       <Spacer height={4} />
       <Pressable
-        onPress={openPicker}
+        onPress={disabled ? undefined : openPicker}
+        disabled={disabled}
         style={[
           styles.input,
           {
             borderColor: hasError ? theme.status.danger : theme.border,
+            backgroundColor: disabled
+              ? theme.backgroundElement
+              : "transparent",
+            opacity: disabled ? 0.85 : 1,
           },
         ]}
       >

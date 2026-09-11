@@ -11,6 +11,7 @@ type SettingsScreenLayoutProps = {
   footerLabel?: string;
   onFooterPress?: () => void;
   footerDisabled?: boolean;
+  footerLoading?: boolean;
 };
 
 export function SettingsScreenLayout({
@@ -19,6 +20,7 @@ export function SettingsScreenLayout({
   footerLabel,
   onFooterPress,
   footerDisabled,
+  footerLoading = false,
 }: SettingsScreenLayoutProps) {
   const theme = useTheme();
 
@@ -36,7 +38,9 @@ export function SettingsScreenLayout({
           <Button
             size="large"
             onPress={onFooterPress}
-            disabled={footerDisabled}
+            disabled={footerDisabled || footerLoading}
+            loading={footerLoading}
+            style={styles.footerButton}
           >
             {footerLabel}
           </Button>
@@ -49,6 +53,7 @@ export function SettingsScreenLayout({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 24,
   },
   scrollContent: {
     gap: 20,
@@ -57,5 +62,8 @@ const styles = StyleSheet.create({
   footer: {
     paddingTop: 8,
     paddingBottom: 8,
+  },
+  footerButton: {
+    borderRadius: 8,
   },
 });

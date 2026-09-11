@@ -35,3 +35,10 @@ export interface User {
   roles: string[];
   updatedAt: string;
 }
+
+export interface IUpdateUser {
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  phonenumber?: string;
+}

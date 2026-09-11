@@ -1,97 +1,83 @@
+import { ThemedDatePicker } from "@/components/themed-date-picker";
 import { ThemedInput } from "@/components/themed-input";
-import { ThemedView } from "@/components/themed-view";
 import { SettingsScreenLayout } from "@/components/ui/settings/settings-screen-layout";
-import { useState } from "react";
-import { StyleSheet } from "react-native";
+import { usePersonalInformation } from "@/hooks/use-personal-information";
+import { Formik } from "formik";
+import { PersonalInformationSchema } from "../../../../schemas/settings.schema";
 
 export default function PersonalInformation() {
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    dateOfBirth: "",
-    bloodGroup: "",
-    gender: "",
-    address: "",
-  });
-
-  const update = (key: keyof typeof form, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
+  const { initialValues, dateOfBirth, loading, savePersonalInformation } =
+    usePersonalInformation();
 
   return (
-    <SettingsScreenLayout
-      title="Personal Information"
-      footerLabel="Save Changes"
-      onFooterPress={() => {}}
+    <Formik
+      initialValues={initialValues}
+      enableReinitialize
+      validationSchema={PersonalInformationSchema}
+      onSubmit={savePersonalInformation}
     >
-      <ThemedInput
-        label="Full Name"
-        placeholder="Input text"
-        value={form.fullName}
-        onChangeText={(value) => update("fullName", value)}
-      />
-      <ThemedInput
-        label="Email Address"
-        placeholder="Input text"
-        keyboardType="email-address"
-        value={form.email}
-        onChangeText={(value) => update("email", value)}
-      />
-      <ThemedInput
-        label="Phone Number"
-        placeholder="Input text"
-        keyboardType="phone-pad"
-        value={form.phone}
-        onChangeText={(value) => update("phone", value)}
-      />
-      <ThemedView style={styles.row}>
-        <ThemedView style={styles.half}>
+      {({
+        handleSubmit,
+        handleChange,
+        handleBlur,
+        touched,
+        errors,
+        values,
+        isValid,
+        dirty,
+      }) => (
+        <SettingsScreenLayout
+          title="Personal Information"
+          footerLabel="Save Changes"
+          onFooterPress={() => handleSubmit()}
+          footerDisabled={loading || !isValid || !dirty}
+          footerLoading={loading}
+        >
           <ThemedInput
+            label="First Name"
+            placeholder="John"
+            keyboardType="default"
+            value={values.firstname}
+            onChangeText={handleChange("firstname")}
+            onBlur={handleBlur("firstname")}
+            error={touched.firstname && errors.firstname}
+          />
+          <ThemedInput
+            label="Last Name"
+            placeholder="Doe"
+            keyboardType="default"
+            value={values.lastname}
+            onChangeText={handleChange("lastname")}
+            onBlur={handleBlur("lastname")}
+            error={touched.lastname && errors.lastname}
+          />
+          <ThemedInput
+            label="Email Address"
+            placeholder="john.doe@example.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={values.email}
+            onChangeText={handleChange("email")}
+            onBlur={handleBlur("email")}
+            error={touched.email && errors.email}
+          />
+          <ThemedInput
+            label="Phone Number"
+            placeholder="08012345678"
+            keyboardType="phone-pad"
+            value={values.phonenumber}
+            onChangeText={handleChange("phonenumber")}
+            onBlur={handleBlur("phonenumber")}
+            error={touched.phonenumber && errors.phonenumber}
+          />
+          <ThemedDatePicker
             label="Date of Birth"
-            placeholder="Input text"
-            value={form.dateOfBirth}
-            onChangeText={(value) => update("dateOfBirth", value)}
+            placeholder="Not set"
+            value={dateOfBirth || null}
+            disabled
           />
-        </ThemedView>
-        <ThemedView style={styles.half}>
-          <ThemedInput
-            label="Blood Group"
-            placeholder="Input text"
-            value={form.bloodGroup}
-            onChangeText={(value) => update("bloodGroup", value)}
-          />
-        </ThemedView>
-      </ThemedView>
-      <ThemedInput
-        label="Gender"
-        placeholder="Input text"
-        value={form.gender}
-        onChangeText={(value) => update("gender", value)}
-      />
-      <ThemedInput
-        label="Home Address"
-        placeholder="Enter Text Here"
-        value={form.address}
-        onChangeText={(value) => update("address", value)}
-        multiline
-        style={styles.addressInput}
-        textAlignVertical="top"
-      />
-    </SettingsScreenLayout>
+        </SettingsScreenLayout>
+      )}
+    </Formik>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  half: {
-    flex: 1,
-  },
-  addressInput: {
-    minHeight: 120,
-    paddingTop: 13.5,
-  },
-});
