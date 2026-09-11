@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/donate/donate-option-card";
 import { UrgentAlertBanner } from "@/components/ui/donate/urgent-alert-banner";
 import { Fonts } from "@/constants/theme";
+import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 
@@ -16,8 +17,20 @@ const DONATION_OPTIONS: DonationOption[] = ["blood", "request", "sperm"];
 export function DonateOptionsScreen() {
   const [selectedOption, setSelectedOption] = useState<DonationOption>("blood");
 
+  const startBloodDonation = () => {
+    router.push("/donate-blood/verify-identity");
+  };
+
   const handleConfirm = () => {
-    // TODO: navigate to the selected donation flow
+    if (selectedOption === "blood") {
+      startBloodDonation();
+    }
+  };
+
+  const handleCtaPress = (option: DonationOption) => {
+    if (option === "blood") {
+      startBloodDonation();
+    }
   };
 
   return (
@@ -37,6 +50,7 @@ export function DonateOptionsScreen() {
               option={option}
               selected={selectedOption === option}
               onPress={() => setSelectedOption(option)}
+              onCtaPress={() => handleCtaPress(option)}
             />
           ))}
         </ThemedView>

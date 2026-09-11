@@ -1,5 +1,11 @@
 import { IAuthResponse, IResponse } from "../types/api-response";
-import { ILogin, IOtp, IRegister, IUpdateUser } from "../types/user";
+import {
+  ILogin,
+  IOtp,
+  IRegister,
+  IUpdateUser,
+  IVerifyNin,
+} from "../types/user";
 import { api } from "./fetcher";
 
 export default () => {
@@ -32,6 +38,14 @@ export default () => {
     ): Promise<IResponse<IAuthResponse["user"]>> {
       return await api("/authentication/me", {
         method: "PUT",
+        body: JSON.stringify(payload),
+      });
+    },
+    async verifyNin(
+      payload: IVerifyNin,
+    ): Promise<IResponse<IAuthResponse["user"]>> {
+      return await api("/nin-verification", {
+        method: "POST",
         body: JSON.stringify(payload),
       });
     },

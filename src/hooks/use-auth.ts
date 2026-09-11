@@ -9,7 +9,7 @@ import { clearAuthToken, saveAuthToken } from "../../services/auth-storage";
 import { redirectToLogin } from "../../services/navigation";
 import { logout, setCredentials, updateUser } from "../../stores/auth.slice";
 import { useAppDispatch } from "../../stores/hooks";
-import { ILogin, IOtp, IRegister } from "../../types/user";
+import { ILogin, IOtp, IRegister, IVerifyNin } from "../../types/user";
 import { getErrorMessage } from "../../utils/lib";
 
 export const useAuth = () => {
@@ -28,6 +28,35 @@ export const useAuth = () => {
       Toast.show({
         type: "error",
         text1: getErrorMessage(e, "OTP verification failed"),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyNin = async (payload: IVerifyNin) => {
+    try {
+      setLoading(true);
+      const res = await $api.auth.verifyNin(payload);
+      const updatedUser = res.data;
+
+      dispatch(
+        updateUser(
+          updatedUser ?? {
+            nationalIdentificationNumberVerified: true,
+          },
+        ),
+      );
+
+      Toast.show({
+        type: "success",
+        text1: "Identity verified",
+      });
+      router.push("/donate-blood/medical-questions");
+    } catch (e) {
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(e, "NIN verification failed"),
       });
     } finally {
       setLoading(false);
@@ -106,5 +135,5 @@ export const useAuth = () => {
     redirectToLogin();
   };
 
-  return { register, login, verifyOtp, me, logOut, loading };
+  return { register, login, verifyOtp, verifyNin, me, logOut, loading };
 };
