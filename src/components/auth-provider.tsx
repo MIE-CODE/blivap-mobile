@@ -3,6 +3,7 @@ import { useOnboardingGuard } from "@/hooks/use-onboarding-guard";
 import { useRouteProtection } from "@/hooks/use-route-protection";
 import { bootstrapAuth } from "../../services/auth-bootstrap";
 import { bootstrapOnboarding, completeOnboarding } from "../../services/onboarding-bootstrap";
+import { initPushNotificationListeners } from "../../services/push-notifications";
 import { useAppDispatch, useAppSelector } from "../../stores/hooks";
 import { PropsWithChildren, useCallback, useEffect } from "react";
 
@@ -24,6 +25,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     init();
   }, [dispatch]);
+
+  useEffect(() => {
+    return initPushNotificationListeners();
+  }, []);
 
   const completeOnboardingFlow = useCallback(async () => {
     await completeOnboarding(dispatch);

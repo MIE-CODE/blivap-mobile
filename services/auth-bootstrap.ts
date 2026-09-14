@@ -7,6 +7,7 @@ import {
 } from "../stores/auth.slice";
 import { $api } from "./api-client";
 import { clearAuthToken, getAuthToken } from "./auth-storage";
+import { registerForPushNotifications } from "./push-notifications";
 
 export async function bootstrapAuth(dispatch: AppDispatch) {
   try {
@@ -20,6 +21,8 @@ export async function bootstrapAuth(dispatch: AppDispatch) {
 
     const res = await $api.auth.me();
     dispatch(setCredentials({ user: res.data, token }));
+    // Existing session: register FCM without blocking bootstrap.
+    void registerForPushNotifications();
   } catch {
     await clearAuthToken();
     dispatch(logout());
