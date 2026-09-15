@@ -1,36 +1,42 @@
-import notifee, {
-  AndroidImportance,
-  EventType,
-  type Event as NotifeeEvent,
-} from "@notifee/react-native";
-import {
-  AuthorizationStatus,
-  getInitialNotification,
-  getMessaging,
-  getToken,
-  hasPermission,
-  onMessage,
-  onNotificationOpenedApp,
-  onTokenRefresh,
-  registerDeviceForRemoteMessages,
-  requestPermission,
-  type RemoteMessage,
-} from "@react-native-firebase/messaging";
 import { Href, router } from "expo-router";
+import * as Device from "expo-device";
 import { PermissionsAndroid, Platform } from "react-native";
 import { PushNotificationData } from "../types/push-notification";
 import { getRouteForPushEvent } from "../src/utils/notification-routes";
 import { $api } from "./api-client";
+import {
+  getFirebaseMessagingModule,
+  isFirebaseConfigured,
+  isRnfbNativeAvailable,
+  logPushEnvironment,
+} from "./firebase";
+import { getNotifee } from "./notifee";
+import { maskToken, pushLog, pushLogError, sleep } from "./push-log";
 
 const ANDROID_CHANNEL_ID = "blivap-default";
+
+type RemoteMessage = {
+  messageId?: string;
+  notification?: { title?: string; body?: string };
+  data?: { [key: string]: string | object };
+};
 
 let tokenRefreshUnsubscribe: (() => void) | null = null;
 let foregroundUnsubscribe: (() => void) | null = null;
 let openedAppUnsubscribe: (() => void) | null = null;
 let listenersReady = false;
 
-function messaging() {
-  return getMessaging();
+function messagingApi() {
+  const messaging = getFirebaseMessagingModule();
+  if (!messaging || !isFirebaseConfigured()) {
+    throw new Error("Firebase is not configured");
+  }
+  return messaging;
+}
+
+function messagingInstance() {
+  const messaging = messagingApi();
+  return messaging.getMessaging();
 }
 
 function getUserAgent() {
@@ -69,134 +75,282 @@ function getPresentation(remoteMessage: RemoteMessage): {
 async function ensureAndroidChannel() {
   if (Platform.OS !== "android") return;
 
-  await notifee.createChannel({
-    id: ANDROID_CHANNEL_ID,
-    name: "General",
-    importance: AndroidImportance.HIGH,
-  });
-}
-
-/**
- * Returns true when notifications are already authorized.
- * Does not prompt the user.
- */
-export async function hasNotificationPermission(): Promise<boolean> {
-  if (Platform.OS === "android" && Number(Platform.Version) >= 33) {
-    return (
-      (await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-      )) === true
-    );
+  const notifeeModule = getNotifee();
+  if (!notifeeModule) {
+    pushLog("warn", "android.channel.skipped", { reason: "notifee_unavailable" });
+    return;
   }
 
-  const status = await hasPermission(messaging());
-  return (
-    status === AuthorizationStatus.AUTHORIZED ||
-    status === AuthorizationStatus.PROVISIONAL
-  );
+  await notifeeModule.default.createChannel({
+    id: ANDROID_CHANNEL_ID,
+    name: "General",
+    importance: notifeeModule.AndroidImportance.HIGH,
+  });
+  pushLog("info", "android.channel.ready", { channelId: ANDROID_CHANNEL_ID });
 }
 
-/**
- * Requests notification permission only when not already decided/denied.
- */
+export async function hasNotificationPermission(): Promise<boolean> {
+  if (!isFirebaseConfigured()) {
+    pushLog("warn", "permission.check.skipped", { reason: "firebase_not_configured" });
+    return false;
+  }
+
+  if (Platform.OS === "android" && Number(Platform.Version) >= 33) {
+    const granted =
+      (await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+      )) === true;
+    pushLog("info", "permission.check.android", { granted });
+    return granted;
+  }
+
+  const messaging = messagingApi();
+  const status = await messaging.hasPermission(messagingInstance());
+  const granted =
+    status === messaging.AuthorizationStatus.AUTHORIZED ||
+    status === messaging.AuthorizationStatus.PROVISIONAL;
+  pushLog("info", "permission.check.ios", { status, granted });
+  return granted;
+}
+
 export async function requestNotificationPermission(): Promise<boolean> {
   try {
+    if (!isFirebaseConfigured()) {
+      pushLog("warn", "permission.request.skipped", {
+        reason: "firebase_not_configured",
+      });
+      return false;
+    }
+
     if (Platform.OS === "android") {
       if (Number(Platform.Version) >= 33) {
         const alreadyGranted = await PermissionsAndroid.check(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
         );
-        if (alreadyGranted) return true;
+        if (alreadyGranted) {
+          pushLog("info", "permission.request.android", {
+            result: "already_granted",
+          });
+          return true;
+        }
 
         const result = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
         );
-        return result === PermissionsAndroid.RESULTS.GRANTED;
+        const granted = result === PermissionsAndroid.RESULTS.GRANTED;
+        pushLog(granted ? "info" : "warn", "permission.request.android", {
+          result,
+          granted,
+        });
+        return granted;
       }
+      pushLog("info", "permission.request.android", {
+        result: "pre_33_auto_granted",
+      });
       return true;
     }
 
-    const current = await hasPermission(messaging());
+    const messaging = messagingApi();
+    const instance = messagingInstance();
+    const current = await messaging.hasPermission(instance);
+    pushLog("info", "permission.status.before_request", { status: current });
+
     if (
-      current === AuthorizationStatus.AUTHORIZED ||
-      current === AuthorizationStatus.PROVISIONAL
+      current === messaging.AuthorizationStatus.AUTHORIZED ||
+      current === messaging.AuthorizationStatus.PROVISIONAL
     ) {
       return true;
     }
 
-    // Don't re-prompt after an explicit denial.
-    if (current === AuthorizationStatus.DENIED) {
+    if (current === messaging.AuthorizationStatus.DENIED) {
+      pushLog("warn", "permission.request.ios", {
+        result: "previously_denied_no_reprompt",
+      });
       return false;
     }
 
-    const next = await requestPermission(messaging());
-    return (
-      next === AuthorizationStatus.AUTHORIZED ||
-      next === AuthorizationStatus.PROVISIONAL
-    );
+    const next = await messaging.requestPermission(instance);
+    const granted =
+      next === messaging.AuthorizationStatus.AUTHORIZED ||
+      next === messaging.AuthorizationStatus.PROVISIONAL;
+    pushLog(granted ? "info" : "warn", "permission.request.ios", {
+      status: next,
+      granted,
+    });
+    return granted;
   } catch (error) {
-    console.warn("[push] permission request failed", error);
+    pushLogError("permission.request.failed", error);
     return false;
   }
 }
 
 async function registerTokenWithBackend(fcmToken: string) {
-  await $api.notifications.registerFcmSubscription({
-    fcmToken,
+  pushLog("info", "backend.register.start", {
+    token: maskToken(fcmToken),
     userAgent: getUserAgent(),
   });
+
+  try {
+    const res = await $api.notifications.registerFcmSubscription({
+      fcmToken,
+      userAgent: getUserAgent(),
+    });
+    pushLog("info", "backend.register.success", {
+      token: maskToken(fcmToken),
+      response: res,
+    });
+  } catch (error) {
+    pushLogError("backend.register.failed", error, {
+      token: maskToken(fcmToken),
+      endpoint: "/notifications/push-subscriptions/fcm",
+    });
+    throw error;
+  }
 }
 
-/**
- * Requests permission (if needed), fetches the raw FCM token,
- * and upserts it with the backend. Failures are logged, never thrown.
- */
 export async function registerForPushNotifications(): Promise<string | null> {
+  pushLog("info", "register.start");
+  logPushEnvironment("registerForPushNotifications");
+
   try {
-    if (Platform.OS === "web") return null;
+    if (Platform.OS === "web") {
+      pushLog("warn", "register.skipped", { reason: "web" });
+      return null;
+    }
+
+    const rnfbOk = isRnfbNativeAvailable();
+    const firebaseOk = isFirebaseConfigured();
+    if (!rnfbOk || !firebaseOk) {
+      pushLog("warn", "register.skipped", {
+        reason: !rnfbOk ? "rnfb_native_unavailable" : "firebase_not_configured",
+        rnfbOk,
+        firebaseOk,
+        hint: "Build/install a custom dev client with GoogleService-Info.plist baked in.",
+      });
+      return null;
+    }
+
+    const messaging = messagingApi();
+    const instance = messagingInstance();
 
     const granted = await requestNotificationPermission();
     if (!granted) {
-      console.warn("[push] notification permission not granted");
+      pushLog("warn", "register.aborted", { reason: "permission_denied" });
       return null;
     }
 
-    // Required on iOS before getToken().
+    // Auto-registration is enabled by default — do not call
+    // registerDeviceForRemoteMessages(); it warns and can throw.
+
     if (Platform.OS === "ios") {
-      await registerDeviceForRemoteMessages(messaging());
+      const isPhysicalDevice = Device.isDevice;
+      pushLog("info", "register.ios_environment", {
+        isPhysicalDevice,
+        deviceName: Device.deviceName,
+        modelName: Device.modelName,
+      });
+
+      if (!isPhysicalDevice) {
+        pushLog("warn", "register.aborted", {
+          reason: "ios_simulator",
+          hint: "FCM needs APNs. Use a physical iPhone running your EAS development build (not Expo Go, not Simulator).",
+        });
+        return null;
+      }
+
+      // FCM getToken() needs an APNs token first on iOS.
+      let apnsToken: string | null = null;
+      for (let attempt = 1; attempt <= 6; attempt++) {
+        try {
+          apnsToken = await messaging.getAPNSToken(instance);
+        } catch (error) {
+          pushLog("warn", "register.apns_token.poll_error", {
+            attempt,
+            errorMessage:
+              error instanceof Error ? error.message : String(error ?? "null"),
+          });
+        }
+
+        pushLog("info", "register.apns_token.poll", {
+          attempt,
+          apnsToken: maskToken(apnsToken),
+        });
+
+        if (apnsToken) break;
+        await sleep(1000);
+      }
+
+      if (!apnsToken) {
+        pushLog("warn", "register.aborted", {
+          reason: "no_apns_token",
+          isPhysicalDevice,
+          hint: "Upload an APNs Auth Key (.p8) in Firebase → Project settings → Cloud Messaging, enable Push Notifications capability, and rebuild the dev client.",
+        });
+        return null;
+      }
     }
 
-    const fcmToken = await getToken(messaging());
+    pushLog("info", "register.get_token.start");
+    let fcmToken: string | null = null;
+    try {
+      fcmToken = await messaging.getToken(instance);
+    } catch (error) {
+      pushLogError("register.get_token.failed", error, {
+        isPhysicalDevice: Device.isDevice,
+        hint: "Usually means APNs is missing/misconfigured, or you're on a simulator.",
+      });
+      throw error;
+    }
+
     if (!fcmToken) {
-      console.warn("[push] empty FCM token");
+      pushLog("warn", "register.aborted", { reason: "empty_fcm_token" });
       return null;
     }
+    pushLog("info", "register.get_token.success", {
+      token: maskToken(fcmToken),
+    });
 
     await registerTokenWithBackend(fcmToken);
     ensureTokenRefreshListener();
 
+    pushLog("info", "register.complete", { token: maskToken(fcmToken) });
     return fcmToken;
   } catch (error) {
-    console.warn("[push] registration failed", error);
+    pushLogError("register.failed", error);
     return null;
   }
 }
 
 function ensureTokenRefreshListener() {
-  if (tokenRefreshUnsubscribe) return;
+  if (tokenRefreshUnsubscribe || !isFirebaseConfigured()) return;
 
-  tokenRefreshUnsubscribe = onTokenRefresh(messaging(), async (token) => {
-    try {
-      await registerTokenWithBackend(token);
-    } catch (error) {
-      console.warn("[push] token refresh re-register failed", error);
-    }
-  });
+  const messaging = messagingApi();
+  tokenRefreshUnsubscribe = messaging.onTokenRefresh(
+    messagingInstance(),
+    async (token) => {
+      pushLog("info", "token.refresh", { token: maskToken(token) });
+      try {
+        await registerTokenWithBackend(token);
+      } catch (error) {
+        pushLogError("token.refresh.backend_failed", error);
+      }
+    },
+  );
+  pushLog("info", "token.refresh.listener_attached");
 }
 
 export async function displayForegroundNotification(
   remoteMessage: RemoteMessage,
 ) {
+  const notifeeModule = getNotifee();
+  if (!notifeeModule) {
+    pushLog("warn", "foreground.display.skipped", {
+      reason: "notifee_unavailable",
+      messageId: remoteMessage.messageId,
+    });
+    return;
+  }
+
   try {
     await ensureAndroidChannel();
     const { title, body } = getPresentation(remoteMessage);
@@ -207,7 +361,14 @@ export async function displayForegroundNotification(
       if (typeof value === "string") notifeeData[key] = value;
     }
 
-    await notifee.displayNotification({
+    pushLog("info", "foreground.display.start", {
+      messageId: remoteMessage.messageId,
+      title,
+      body,
+      event: data.event,
+    });
+
+    await notifeeModule.default.displayNotification({
       title,
       body,
       data: notifeeData,
@@ -219,84 +380,135 @@ export async function displayForegroundNotification(
         sound: "default",
       },
     });
+    pushLog("info", "foreground.display.success", {
+      messageId: remoteMessage.messageId,
+    });
   } catch (error) {
-    console.warn("[push] foreground display failed", error);
+    pushLogError("foreground.display.failed", error, {
+      messageId: remoteMessage.messageId,
+    });
   }
 }
 
 function navigateFromData(data: PushNotificationData) {
   try {
     const href = getRouteForPushEvent(data.event, data);
+    pushLog("info", "navigate", { event: data.event, href, data });
     router.push(href as Href);
   } catch (error) {
-    console.warn("[push] navigation failed", error);
+    pushLogError("navigate.failed", error, { data });
   }
 }
 
-/**
- * Background/quit handler lives in `push-notifications-background.ts`
- * and is registered from root `index.js` (before Expo Router boots).
- */
-
-/**
- * Sets up foreground message display + notification-open navigation.
- * Safe to call multiple times; listeners are only attached once.
- */
 export function initPushNotificationListeners() {
-  if (Platform.OS === "web" || listenersReady) return () => {};
+  logPushEnvironment("initPushNotificationListeners");
+
+  if (Platform.OS === "web" || listenersReady) {
+    pushLog("info", "listeners.skipped", {
+      reason: Platform.OS === "web" ? "web" : "already_ready",
+    });
+    return () => {};
+  }
+
+  if (!isRnfbNativeAvailable() || !isFirebaseConfigured()) {
+    pushLog("warn", "listeners.skipped", {
+      reason: !isRnfbNativeAvailable()
+        ? "rnfb_native_unavailable"
+        : "firebase_not_configured",
+    });
+    return () => {};
+  }
+
+  const messaging = messagingApi();
+  const instance = messagingInstance();
 
   listenersReady = true;
   ensureTokenRefreshListener();
 
-  foregroundUnsubscribe = onMessage(messaging(), async (remoteMessage) => {
+  foregroundUnsubscribe = messaging.onMessage(instance, async (remoteMessage) => {
+    pushLog("info", "message.foreground", {
+      messageId: remoteMessage.messageId,
+      hasNotification: !!remoteMessage.notification,
+      data: asData(remoteMessage),
+    });
     await displayForegroundNotification(remoteMessage);
   });
 
-  openedAppUnsubscribe = onNotificationOpenedApp(
-    messaging(),
+  openedAppUnsubscribe = messaging.onNotificationOpenedApp(
+    instance,
     (remoteMessage) => {
+      pushLog("info", "message.opened_from_background", {
+        messageId: remoteMessage.messageId,
+        data: asData(remoteMessage),
+      });
       navigateFromData(asData(remoteMessage));
     },
   );
 
-  // Cold start from a notification tap (FCM).
-  getInitialNotification(messaging())
+  messaging
+    .getInitialNotification(instance)
     .then((remoteMessage) => {
       if (remoteMessage) {
+        pushLog("info", "message.opened_from_quit", {
+          messageId: remoteMessage.messageId,
+          data: asData(remoteMessage),
+        });
         navigateFromData(asData(remoteMessage));
+      } else {
+        pushLog("info", "message.no_initial_notification");
       }
     })
     .catch((error) => {
-      console.warn("[push] getInitialNotification failed", error);
+      pushLogError("message.get_initial_failed", error);
     });
 
-  // Cold start from a Notifee-displayed notification tap.
-  notifee
-    .getInitialNotification()
-    .then((initial) => {
-      if (initial?.notification?.data) {
-        navigateFromData(initial.notification.data as PushNotificationData);
-      }
-    })
-    .catch((error) => {
-      console.warn("[push] notifee getInitialNotification failed", error);
-    });
+  const notifeeModule = getNotifee();
+  let notifeeUnsubscribe: (() => void) | undefined;
 
-  // Notifee foreground press (local notifications shown while app is open).
-  const notifeeUnsubscribe = notifee.onForegroundEvent(
-    ({ type, detail }: NotifeeEvent) => {
-      if (type !== EventType.PRESS) return;
-      const data = (detail.notification?.data ?? {}) as PushNotificationData;
-      navigateFromData(data);
-    },
-  );
+  if (notifeeModule) {
+    const { EventType } = notifeeModule;
+
+    notifeeModule.default
+      .getInitialNotification()
+      .then((initial) => {
+        if (initial?.notification?.data) {
+          pushLog("info", "notifee.opened_from_quit", {
+            data: initial.notification.data,
+          });
+          navigateFromData(
+            initial.notification.data as PushNotificationData,
+          );
+        }
+      })
+      .catch((error) => {
+        pushLogError("notifee.get_initial_failed", error);
+      });
+
+    notifeeUnsubscribe = notifeeModule.default.onForegroundEvent(
+      ({ type, detail }) => {
+        pushLog("info", "notifee.foreground_event", {
+          type,
+          data: detail.notification?.data,
+        });
+        if (type !== EventType.PRESS) return;
+        const data = (detail.notification?.data ??
+          {}) as PushNotificationData;
+        navigateFromData(data);
+      },
+    );
+  } else {
+    pushLog("warn", "listeners.notifee_skipped");
+  }
+
+  pushLog("info", "listeners.ready");
 
   return () => {
     foregroundUnsubscribe?.();
     openedAppUnsubscribe?.();
-    notifeeUnsubscribe();
+    notifeeUnsubscribe?.();
     foregroundUnsubscribe = null;
     openedAppUnsubscribe = null;
     listenersReady = false;
+    pushLog("info", "listeners.torn_down");
   };
 }

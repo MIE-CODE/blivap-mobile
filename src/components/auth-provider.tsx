@@ -27,7 +27,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [dispatch]);
 
   useEffect(() => {
-    return initPushNotificationListeners();
+    try {
+      console.log("[push] auth_provider.init_listeners");
+      return initPushNotificationListeners();
+    } catch (error) {
+      console.warn("[push] auth_provider.init_listeners.failed", error);
+      return () => {};
+    }
   }, []);
 
   const completeOnboardingFlow = useCallback(async () => {

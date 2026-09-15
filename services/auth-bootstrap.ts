@@ -22,6 +22,7 @@ export async function bootstrapAuth(dispatch: AppDispatch) {
     const res = await $api.auth.me();
     dispatch(setCredentials({ user: res.data, token }));
     // Existing session: register FCM without blocking bootstrap.
+    console.log("[push] auth.bootstrap.trigger_register");
     void registerForPushNotifications();
   } catch {
     await clearAuthToken();

@@ -1,22 +1,46 @@
 import { Platform } from "react-native";
 
-// FCM / Notifee are native-only. Skip on web so Expo web can boot.
+// FCM / Notifee are native-only and must not be required unless linked.
 if (Platform.OS !== "web") {
-  const notifee = require("@notifee/react-native").default;
-  const { EventType } = require("@notifee/react-native");
-  const {
-    registerBackgroundMessageHandler,
-  } = require("./services/push-notifications-background");
+  try {
+    const {
+      isRnfbNativeAvailable,
+      logPushEnvironment,
+    } = require("./services/firebase");
+    const { pushLog } = require("./services/push-log");
 
-  // Must run before Expo Router mounts so FCM can wake a quit/background app.
-  registerBackgroundMessageHandler();
+    logPushEnvironment("index.js");
 
-  // Keep the JS context alive for Notifee presses on data-only notifications.
-  notifee.onBackgroundEvent(async ({ type }) => {
-    if (type === EventType.PRESS) {
-      // Navigation is handled on the next launch via getInitialNotification.
+    if (isRnfbNativeAvailable()) {
+      const {
+        registerBackgroundMessageHandler,
+      } = require("./services/push-notifications-background");
+      registerBackgroundMessageHandler();
+
+      const { getNotifee } = require("./services/notifee");
+      const notifeeModule = getNotifee();
+      if (notifeeModule) {
+        const { EventType } = notifeeModule;
+        notifeeModule.default.onBackgroundEvent(async ({ type }) => {
+          pushLog("info", "notifee.background_event", { type });
+          if (type === EventType.PRESS) {
+            // Navigation is handled on the next launch via getInitialNotification.
+          }
+        });
+        pushLog("info", "notifee.background_events.registered");
+      }
+    } else {
+      pushLog("warn", "index.push_native.skipped", {
+        reason: "rnfb_native_unavailable",
+        hint: "You opened Expo Go or an old binary. Install the EAS development build, then open THAT app (not Expo Go).",
+      });
     }
-  });
+  } catch (error) {
+    console.warn(
+      "[push] index.push_native.failed",
+      error instanceof Error ? error.message : String(error),
+    );
+  }
 }
 
 import "expo-router/entry";

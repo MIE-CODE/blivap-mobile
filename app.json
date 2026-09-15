@@ -9,13 +9,13 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.anonymous.Blivap",
-      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.miecode.blivap",
       "entitlements": {
-        "aps-environment": "production"
+        "aps-environment": "development"
       },
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": ["remote-notification"],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -26,8 +26,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.Blivap",
-      "googleServicesFile": "./google-services.json",
+      "package": "com.miecode.blivap",
       "permissions": ["android.permission.POST_NOTIFICATIONS"]
     },
     "web": {
@@ -36,7 +35,15 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-firebase/app",
+      "expo-notifications",
+      [
+        "@react-native-firebase/app",
+        {
+          "ios": {
+            "disableSPM": true
+          }
+        }
+      ],
       "@react-native-firebase/messaging",
       [
         "expo-splash-screen",
@@ -53,7 +60,8 @@
         "expo-build-properties",
         {
           "ios": {
-            "useFrameworks": "dynamic"
+            "useFrameworks": "static",
+            "forceStaticLinking": ["RNFBApp", "RNFBMessaging"]
           }
         }
       ]
@@ -61,6 +69,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "618e64b0-35f1-4892-9fc9-e69d4a8daf0a"
+      }
+    },
+    "owner": "mie-tech"
   }
 }

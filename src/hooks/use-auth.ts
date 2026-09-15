@@ -14,6 +14,7 @@ import { ILogin, IOtp, IRegister, IVerifyNin } from "../../types/user";
 import { getErrorMessage } from "../../utils/lib";
 
 function registerPushInBackground() {
+  console.log("[push] auth.trigger_register_after_login");
   void registerForPushNotifications();
 }
 
