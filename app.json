@@ -9,13 +9,13 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.miecode.blivap",
-      "entitlements": {
-        "aps-environment": "development"
-      },
+      "bundleIdentifier": "com.miecode.blivap.dev",
+      "appleTeamId": "5D5QKB6F5C",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"],
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
       }
     },
     "android": {
@@ -35,7 +35,6 @@
     },
     "plugins": [
       "expo-router",
-      "expo-notifications",
       [
         "@react-native-firebase/app",
         {
