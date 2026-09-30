@@ -7,10 +7,31 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { Feather, Octicons } from "@expo/vector-icons";
+import { formatKobo, parseWelfareWallet } from "@/utils/welfare";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
+import { $api } from "../../services/api-client";
 export const WalletWidget = () => {
   const theme = useTheme();
+  const [welfareBalance, setWelfareBalance] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void $api.welfare
+      .wallet()
+      .then((res) => {
+        if (!active) return;
+        const wallet = parseWelfareWallet(res);
+        if (wallet.availableKobo > 0 || wallet.entries.length > 0) {
+          setWelfareBalance(formatKobo(wallet.availableKobo));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
   return (
     <ThemedView
       style={[
@@ -56,7 +77,7 @@ export const WalletWidget = () => {
               fontSize: 32,
             }}
           >
-            ₦0
+            {welfareBalance ?? "₦0"}
           </ThemedText>
           <Pressable onPress={() => {}}>
             <Octicons name="eye" size={24} color="#FFFFFF80" />

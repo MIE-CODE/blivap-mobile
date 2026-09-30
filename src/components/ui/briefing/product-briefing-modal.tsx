@@ -67,8 +67,8 @@ const BRIEFING_SLIDES: BriefingSlide[] = [
     ],
     body: (
       <>
-        Track your donations, manage your wallet, and receive compensation for
-        eligible blood and sperm donations — all in one secure app.
+        Track your donations, manage your wallet, and see welfare reimbursement
+        for eligible expenses after a completed donation.
       </>
     ),
   },

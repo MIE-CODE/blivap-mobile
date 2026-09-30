@@ -15,7 +15,7 @@ import { useAppSelector } from "../../../stores/hooks";
 export default function VerifyOtp() {
   const theme = useTheme();
   const { user } = useAppSelector((s) => s.auth);
-  const { verifyOtp, loading } = useAuth();
+  const { verifyOtp, resendVerification, loading } = useAuth();
   const router = useRouter();
 
   return (
@@ -67,6 +67,7 @@ export default function VerifyOtp() {
                 error={touched.otp && errors.otp}
                 inputCount={6}
                 type="text"
+                inputStyle={{ fontSize: 16, paddingHorizontal: 18 }}
               />
               <Spacer height={24} />
               <ThemedText
@@ -76,6 +77,9 @@ export default function VerifyOtp() {
                 Didn’t receive the OTP?{" "}
               </ThemedText>
               <ThemedText
+                onPress={() => {
+                  if (user?.email) void resendVerification(user.email);
+                }}
                 style={{
                   color: theme.text,
                   textDecorationLine: "underline",

@@ -22,7 +22,7 @@ export default function Home() {
       safe
       style={{ flex: 1, paddingBottom: 0, paddingHorizontal: 0 }}
     >
-      <Spacer height={22} />
+      <Spacer height={4} />
       <ThemedView
         style={{
           flexDirection: "row",
@@ -54,10 +54,14 @@ export default function Home() {
         </ThemedView>
         <Pressable
           style={{
+            width: 45,
+            height: 45,
+            borderWidth: 1,
+            borderRadius: 25,
+            justifyContent: "center",
+            alignItems: "center",
             padding: 4,
-            borderWidth: 0.5,
             borderColor: theme.primary,
-            borderRadius: 100,
           }}
           onPress={() => router.push("/notification")}
         >

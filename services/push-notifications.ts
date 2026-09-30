@@ -14,6 +14,8 @@ import { getNotifee } from "./notifee";
 import { maskToken, pushLog, pushLogError, sleep } from "./push-log";
 
 const ANDROID_CHANNEL_ID = "blivap-default";
+/** PNG of https://blivap.com/bimi/blivap-bimi.svg. Android cannot render the SVG. */
+export const PUSH_NOTIFICATION_IMAGE_URL = "https://blivap.com/icon1.png";
 
 type RemoteMessage = {
   messageId?: string;
@@ -375,9 +377,19 @@ export async function displayForegroundNotification(
       android: {
         channelId: ANDROID_CHANNEL_ID,
         pressAction: { id: "default" },
+        largeIcon:
+          (typeof data.image === "string" && data.image) ||
+          PUSH_NOTIFICATION_IMAGE_URL,
       },
       ios: {
         sound: "default",
+        attachments: [
+          {
+            url:
+              (typeof data.image === "string" && data.image) ||
+              PUSH_NOTIFICATION_IMAGE_URL,
+          },
+        ],
       },
     });
     pushLog("info", "foreground.display.success", {

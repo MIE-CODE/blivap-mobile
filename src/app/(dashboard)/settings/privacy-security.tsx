@@ -1,20 +1,24 @@
+import { Spacer } from "@/components/spacer";
 import { ThemedInput } from "@/components/themed-input";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { SettingsScreenLayout } from "@/components/ui/settings/settings-screen-layout";
+import { SettingsSectionLabel } from "@/components/ui/settings/settings-section-label";
 import {
   SettingsCard,
   SettingsToggleRow,
 } from "@/components/ui/settings/settings-toggle-row";
-import { SettingsScreenLayout } from "@/components/ui/settings/settings-screen-layout";
-import { SettingsSectionLabel } from "@/components/ui/settings/settings-section-label";
 import { Fonts } from "@/constants/theme";
+import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
+import { changePasswordSchema } from "../../../../schemas/auth.schema";
 
 export default function PrivacySecurity() {
   const theme = useTheme();
+  const { changePassword, loading } = useAuth();
   const [twoFactor, setTwoFactor] = useState(true);
   const [biometric, setBiometric] = useState(true);
   const [passwords, setPasswords] = useState({
@@ -22,14 +26,43 @@ export default function PrivacySecurity() {
     next: "",
     confirm: "",
   });
+  const [error, setError] = useState<string | null>(null);
+
+  const savePassword = async () => {
+    try {
+      await changePasswordSchema.validate(
+        {
+          oldPassword: passwords.current,
+          password: passwords.next,
+          confirmPassword: passwords.confirm,
+        },
+        { abortEarly: true },
+      );
+      setError(null);
+      const saved = await changePassword(passwords.current, passwords.next);
+      if (saved) {
+        setPasswords({ current: "", next: "", confirm: "" });
+      }
+    } catch (validationError) {
+      const message =
+        validationError instanceof Error
+          ? validationError.message
+          : "Check your password fields";
+      setError(message);
+    }
+  };
 
   return (
     <SettingsScreenLayout
       title="Privacy & Security"
       footerLabel="Save Changes"
-      onFooterPress={() => {}}
+      footerLoading={loading}
+      onFooterPress={() => {
+        void savePassword();
+      }}
     >
       <ThemedView style={styles.section}>
+        <Spacer height={10} />
         <SettingsSectionLabel title="Change Password" />
         <ThemedInput
           label="Current Password"
@@ -58,9 +91,13 @@ export default function PrivacySecurity() {
             setPasswords((prev) => ({ ...prev, confirm: value }))
           }
         />
+        {error ? (
+          <ThemedText style={{ color: theme.primary }}>{error}</ThemedText>
+        ) : null}
       </ThemedView>
 
       <ThemedView style={styles.section}>
+        <Spacer height={10} />
         <SettingsSectionLabel title="Security Preferences" />
         <SettingsCard>
           <SettingsToggleRow
@@ -78,6 +115,7 @@ export default function PrivacySecurity() {
       </ThemedView>
 
       <ThemedView style={styles.section}>
+        <Spacer height={10} />
         <SettingsSectionLabel title="Danger Zone" />
         <SettingsCard>
           <Pressable onPress={() => router.push("/settings/delete-account")}>

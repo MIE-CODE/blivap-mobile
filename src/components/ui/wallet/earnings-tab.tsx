@@ -5,7 +5,10 @@ import { ThemedView } from "@/components/themed-view";
 import { EarningHistoryCard } from "@/components/ui/wallet/earning-history-card";
 import { Colors, Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { parseWelfareWallet, WelfareWalletEntry } from "@/utils/welfare";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
+import { $api } from "../../../../services/api-client";
 
 const EARNINGS_SUMMARY = {
   total: 150_000,
@@ -80,6 +83,23 @@ const StatColumn = ({ label, amount, showDivider }: StatColumnProps) => {
 
 export const EarningsTab = () => {
   const theme = useTheme();
+  const [welfareEntries, setWelfareEntries] = useState<WelfareWalletEntry[]>(
+    [],
+  );
+
+  useEffect(() => {
+    let active = true;
+    void $api.welfare
+      .wallet()
+      .then((res) => {
+        if (!active) return;
+        setWelfareEntries(parseWelfareWallet(res).entries);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <ThemedView>
@@ -141,15 +161,30 @@ export const EarningsTab = () => {
       <Spacer height={12} />
 
       <ThemedView style={styles.historyList}>
-        {EARNING_HISTORY.map((item) => (
-          <EarningHistoryCard
-            key={item.id}
-            title={item.title}
-            subtitle={item.subtitle}
-            date={item.date}
-            amount={item.amount}
-          />
-        ))}
+        {welfareEntries.length
+          ? welfareEntries.map((entry) => (
+              <EarningHistoryCard
+                key={entry.bookingId}
+                title={entry.label}
+                subtitle="Eligible donor expenses"
+                date={
+                  entry.createdAt
+                    ? new Date(entry.createdAt).toLocaleString()
+                    : ""
+                }
+                amount={entry.amountKobo / 100}
+                status="Welfare reimbursement"
+              />
+            ))
+          : EARNING_HISTORY.map((item) => (
+              <EarningHistoryCard
+                key={item.id}
+                title={item.title}
+                subtitle={item.subtitle}
+                date={item.date}
+                amount={item.amount}
+              />
+            ))}
       </ThemedView>
     </ThemedView>
   );

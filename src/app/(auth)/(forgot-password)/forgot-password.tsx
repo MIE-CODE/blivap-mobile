@@ -11,7 +11,7 @@ import { StyleSheet } from "react-native";
 import { forgotPasswordSchema } from "../../../../schemas/auth.schema";
 
 export default function forgotPassword() {
-  const { loading } = useAuth();
+  const { loading, forgotPassword: sendResetEmail } = useAuth();
   const router = useRouter();
   return (
     <ThemedView safe style={{ flex: 1, alignItems: "flex-start" }}>
@@ -26,7 +26,14 @@ export default function forgotPassword() {
       <Formik
         initialValues={{ email: "" }}
         validationSchema={forgotPasswordSchema}
-        onSubmit={() => router.push("/password-reset-code")}
+        onSubmit={async (values) => {
+          const sent = await sendResetEmail(values.email.trim());
+          if (!sent) return;
+          router.push({
+            pathname: "/password-reset-code",
+            params: { email: values.email.trim() },
+          });
+        }}
         validateOnMount
       >
         {({

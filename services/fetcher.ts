@@ -41,10 +41,14 @@ export const api = async <T = unknown>(
       redirectToLogin();
     }
 
-    throw new ApiError(
-      errorBody?.message ?? `Request failed with status ${res.status}`,
-      res.status,
-    );
+    const rawMessage = errorBody?.message;
+    const message = Array.isArray(rawMessage)
+      ? rawMessage.filter(Boolean).join(", ")
+      : typeof rawMessage === "string"
+        ? rawMessage
+        : `Request failed with status ${res.status}`;
+
+    throw new ApiError(message, res.status);
   }
   return (await res.json()) as T;
 };

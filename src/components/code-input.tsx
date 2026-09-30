@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 16,
+    gap: 10,
     width: "100%",
   },
   input: {
@@ -165,6 +165,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 13,
     textAlign: "center",
-    fontSize: 24,
+    fontSize: 16,
   },
 });

@@ -3,6 +3,7 @@ import { Octicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   KeyboardTypeOptions,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -41,6 +42,7 @@ export const ThemedInput = ({
         <Spacer height={4} />
         <TextInput
           placeholder={placeholder}
+          placeholderTextColor={theme.textSecondary}
           style={[
             styles.input,
             {
@@ -53,7 +55,6 @@ export const ThemedInput = ({
             },
           ]}
           value={value}
-          secureTextEntry={showPassword}
           editable={!disabled}
           {...props}
         />
@@ -78,15 +79,13 @@ export const ThemedInput = ({
         ]}
       >
         <TextInput
+          key={showPassword ? "visible" : "hidden"}
           placeholder={placeholder}
-          style={{
-            paddingVertical: 13.5,
-            paddingRight: 20,
-            flex: 1,
-            color: theme.text,
-          }}
+          placeholderTextColor={theme.textSecondary}
+          style={[styles.passwordInput, { color: theme.text }]}
           value={value}
           secureTextEntry={!showPassword}
+          textAlignVertical="center"
           {...props}
         />
         <Pressable onPress={() => setShowPassword((prev) => !prev)}>
@@ -126,6 +125,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
+    height: 48,
+  },
+  passwordInput: {
+    flex: 1,
+    height: 48,
+    margin: 0,
+    paddingVertical: 0,
+    paddingRight: 12,
+    fontSize: 16,
+    textAlignVertical: "center",
+    ...(Platform.OS === "android" ? { includeFontPadding: false } : null),
   },
   error: {
     fontSize: 10,

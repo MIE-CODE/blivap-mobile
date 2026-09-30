@@ -5,67 +5,82 @@ import { SettingsScreenLayout } from "@/components/ui/settings/settings-screen-l
 import { SettingsSectionLabel } from "@/components/ui/settings/settings-section-label";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { StyleSheet } from "react-native";
-
-const DONATIONS = [
-  {
-    date: "October 14, 2025",
-    location: "San Francisco General Hospital",
-    type: "Whole Blood",
-    points: 250,
-  },
-  {
-    date: "July 22, 2025",
-    location: "Red Cross Donation Center",
-    type: "Whole Blood",
-    points: 250,
-  },
-  {
-    date: "April 05, 2025",
-    location: "Stanford Blood Center",
-    type: "Double Red Cells",
-    points: 500,
-  },
-  {
-    date: "January 11, 2025",
-    location: "Pacific Heights Clinic",
-    type: "Whole Blood",
-    points: 250,
-  },
-];
+import { AppBooking, formatWhen, parseBookings } from "@/utils/bookings";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
+import { $api } from "../../../../services/api-client";
+import { getErrorMessage } from "../../../../utils/lib";
 
 export default function DonationHistory() {
   const theme = useTheme();
+  const [bookings, setBookings] = useState<AppBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [received, sent] = await Promise.all([
+        $api.bookings.received(),
+        $api.bookings.sent(),
+      ]);
+      const rows = [...parseBookings(received), ...parseBookings(sent)]
+        .filter((booking) => booking.status === "completed")
+        .sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt));
+      setBookings(rows);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(error, "Could not load donation history"),
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   return (
     <SettingsScreenLayout title="Donation History">
-      <ThemedView style={[styles.summaryCard, { backgroundColor: theme.primary }]}>
-        <ThemedText style={styles.summaryLabel}>DONOR IMPACT SUMMARY</ThemedText>
+      <ThemedView
+        style={[styles.summaryCard, { backgroundColor: theme.primary }]}
+      >
+        <ThemedText style={styles.summaryLabel}>
+          DONOR IMPACT SUMMARY
+        </ThemedText>
         <Line strokeWidth={1} strokeColor="rgba(255,255,255,0.35)" />
-        <ThemedText style={styles.summaryTitle}>12 Total Donations</ThemedText>
+        <ThemedText style={styles.summaryTitle}>
+          {bookings.length} Total Donations
+        </ThemedText>
         <ThemedText style={styles.summaryBody}>
-          You have consistently supported local clinics. Your gold donor status
-          helps prioritize your future matching requests.
+          Completed bookings from your donor and requester history show up here.
         </ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.section}>
         <SettingsSectionLabel title="Donation Timeline" />
         <ThemedView style={styles.timeline}>
-          {DONATIONS.map((item) => (
+          {loading ? <ActivityIndicator color={theme.primary} /> : null}
+          {!loading && !bookings.length ? (
+            <ThemedText style={{ color: theme.textSecondary }}>
+              No completed donations yet.
+            </ThemedText>
+          ) : null}
+          {bookings.map((item) => (
             <ThemedView
-              key={item.date}
+              key={item.id}
               style={[styles.timelineCard, { shadowColor: theme.text }]}
             >
               <ThemedView style={styles.timelineHeader}>
-                <ThemedText style={[styles.date, { color: theme.textSecondary }]}>
-                  {item.date}
+                <ThemedText
+                  style={[styles.date, { color: theme.textSecondary }]}
+                >
+                  {formatWhen(item.scheduledAt)}
                 </ThemedText>
                 <ThemedView
-                  style={[
-                    styles.statusBadge,
-                    { backgroundColor: "#DCFCE8" },
-                  ]}
+                  style={[styles.statusBadge, { backgroundColor: "#DCFCE8" }]}
                 >
                   <ThemedText
                     style={[styles.statusText, { color: theme.status.success }]}
@@ -74,20 +89,34 @@ export default function DonationHistory() {
                   </ThemedText>
                 </ThemedView>
               </ThemedView>
-              <ThemedText style={styles.location}>{item.location}</ThemedText>
+              <ThemedText style={styles.location}>
+                {item.hospitalName}
+              </ThemedText>
               <ThemedView style={styles.timelineFooter}>
-                <ThemedText style={[styles.meta, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.meta, { color: theme.textSecondary }]}
+                >
                   Type:{" "}
-                  <ThemedText style={{ color: theme.primary, fontFamily: Fonts.inter.bold }}>
-                    {item.type}
+                  <ThemedText
+                    style={{
+                      color: theme.primary,
+                      fontFamily: Fonts.inter.bold,
+                    }}
+                  >
+                    {item.bloodType}
                   </ThemedText>
                 </ThemedText>
-                <ThemedText style={[styles.meta, { color: theme.textSecondary }]}>
-                  Points Earned:{" "}
+                <ThemedText
+                  style={[styles.meta, { color: theme.textSecondary }]}
+                >
+                  Status:{" "}
                   <ThemedText
-                    style={{ color: theme.status.success, fontFamily: Fonts.inter.bold }}
+                    style={{
+                      color: theme.status.success,
+                      fontFamily: Fonts.inter.bold,
+                    }}
                   >
-                    +{item.points}
+                    {item.status}
                   </ThemedText>
                 </ThemedText>
               </ThemedView>

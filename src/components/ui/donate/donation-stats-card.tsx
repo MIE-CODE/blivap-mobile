@@ -7,25 +7,29 @@ import { StyleSheet } from "react-native";
 type DonationStatsCardProps = {
   totalDonated: string;
   livesSaved: string;
+  totalLabel?: string;
+  livesLabel?: string;
 };
 
 export function DonationStatsCard({
   totalDonated,
   livesSaved,
+  totalLabel = "TOTAL DONATED",
+  livesLabel = "LIVES SAVED",
 }: DonationStatsCardProps) {
   const theme = useTheme();
 
   return (
     <ThemedView style={[styles.card, { backgroundColor: theme.primary }]}>
       <ThemedView style={styles.stat}>
-        <ThemedText style={styles.label}>TOTAL DONATED</ThemedText>
+        <ThemedText style={styles.label}>{totalLabel}</ThemedText>
         <ThemedText style={styles.value}>{totalDonated}</ThemedText>
       </ThemedView>
 
       <ThemedView style={styles.divider} />
 
       <ThemedView style={styles.stat}>
-        <ThemedText style={styles.label}>LIVES SAVED</ThemedText>
+        <ThemedText style={styles.label}>{livesLabel}</ThemedText>
         <ThemedText style={styles.value}>{livesSaved}</ThemedText>
       </ThemedView>
     </ThemedView>

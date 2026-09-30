@@ -133,7 +133,82 @@ export const useAuth = () => {
     }
   };
 
+  const forgotPassword = async (email: string) => {
+    try {
+      setLoading(true);
+      await $api.auth.forgotPassword({ email });
+      Toast.show({
+        type: "success",
+        text1: "Reset link sent to your email",
+      });
+      return true;
+    } catch (e) {
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(e, "Could not send reset email"),
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (resetToken: string, password: string) => {
+    try {
+      setLoading(true);
+      await $api.auth.resetPassword({ resetToken, password });
+      Toast.show({ type: "success", text1: "Password reset successfully" });
+      router.replace("/login");
+      return true;
+    } catch (e) {
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(e, "Password reset failed"),
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changePassword = async (oldPassword: string, password: string) => {
+    try {
+      setLoading(true);
+      await $api.auth.changePassword({ oldPassword, password });
+      Toast.show({ type: "success", text1: "Password changed" });
+      return true;
+    } catch (e) {
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(e, "Could not change password"),
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendVerification = async (email: string) => {
+    try {
+      setLoading(true);
+      await $api.auth.resendEmailVerification(email);
+      Toast.show({ type: "success", text1: "Verification code sent" });
+    } catch (e) {
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(e, "Could not resend the code"),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logOut = async () => {
+    try {
+      await $api.auth.logout();
+    } catch {
+      // Local session still ends if the server token is already invalid.
+    }
     await clearAuthToken();
     dispatch(logout());
     Toast.show({
@@ -143,5 +218,17 @@ export const useAuth = () => {
     redirectToLogin();
   };
 
-  return { register, login, verifyOtp, verifyNin, me, logOut, loading };
+  return {
+    register,
+    login,
+    verifyOtp,
+    verifyNin,
+    me,
+    forgotPassword,
+    resetPassword,
+    changePassword,
+    resendVerification,
+    logOut,
+    loading,
+  };
 };

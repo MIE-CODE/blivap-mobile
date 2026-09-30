@@ -5,7 +5,7 @@ import { Colors, Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { isDonor } from "@/utils/user-roles";
 import { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Platform, Pressable, StyleSheet, Text } from "react-native";
 import { useAppSelector } from "../../stores/hooks";
 import { Spacer } from "./spacer";
 import { ThemedView } from "./themed-view";
@@ -24,6 +24,7 @@ export const TabBar = (props: BottomTabBarProps) => {
     <ThemedView
       style={[
         styles.container,
+        Platform.OS === "android" && styles.androidLift,
         { shadowColor: theme.text, backgroundColor: theme.background },
       ]}
     >
@@ -110,6 +111,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 2,
+  },
+  androidLift: {
+    paddingBottom: 34,
   },
   plusIcon: {
     borderColor: "white",

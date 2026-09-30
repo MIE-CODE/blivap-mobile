@@ -1,70 +1,111 @@
-import { useTheme } from "@/hooks/use-theme";
+import { Fonts } from "@/constants/theme";
 import { Image } from "expo-image";
 import * as SplashScreen from "expo-splash-screen";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import Animated, { Easing, Keyframe } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
-import { ThemedText } from "./themed-text";
+import Animated, {
+  Easing,
+  Keyframe,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 
 const INITIAL_SCALE_FACTOR = Dimensions.get("screen").height / 90;
 const DURATION = 600;
+const BRAND = "#960018";
+const easeOut = Easing.out(Easing.cubic);
 
 export function AnimatedSplashOverlay() {
-  const theme = useTheme();
-  const [animate, setAnimate] = useState(false);
   const [visible, setVisible] = useState(true);
+  const logoOpacity = useSharedValue(0);
+  const logoScale = useSharedValue(0.86);
+  const ringScale = useSharedValue(0.7);
+  const ringOpacity = useSharedValue(0);
+  const titleOpacity = useSharedValue(0);
+  const titleY = useSharedValue(14);
+  const overlayOpacity = useSharedValue(1);
+
+  const hide = () => setVisible(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    SplashScreen.hideAsync().finally(() => {
+      if (cancelled) return;
+
+      logoOpacity.value = withTiming(1, { duration: 560, easing: easeOut });
+      logoScale.value = withTiming(1, { duration: 780, easing: easeOut });
+
+      ringOpacity.value = withDelay(
+        140,
+        withTiming(0.35, { duration: 280, easing: easeOut }, (finished) => {
+          if (finished) {
+            ringOpacity.value = withTiming(0, { duration: 720, easing: easeOut });
+          }
+        }),
+      );
+      ringScale.value = withDelay(
+        140,
+        withTiming(1.55, { duration: 980, easing: easeOut }),
+      );
+
+      titleOpacity.value = withDelay(
+        340,
+        withTiming(1, { duration: 480, easing: easeOut }),
+      );
+      titleY.value = withDelay(
+        340,
+        withTiming(0, { duration: 560, easing: easeOut }),
+      );
+
+      overlayOpacity.value = withDelay(
+        1480,
+        withTiming(0, { duration: 460, easing: Easing.inOut(Easing.cubic) }, (finished) => {
+          if (finished) runOnJS(hide)();
+        }),
+      );
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [logoOpacity, logoScale, overlayOpacity, ringOpacity, ringScale, titleOpacity, titleY]);
+
+  const overlayStyle = useAnimatedStyle(() => ({
+    opacity: overlayOpacity.value,
+  }));
+  const logoStyle = useAnimatedStyle(() => ({
+    opacity: logoOpacity.value,
+    transform: [{ scale: logoScale.value }],
+  }));
+  const ringStyle = useAnimatedStyle(() => ({
+    opacity: ringOpacity.value,
+    transform: [{ scale: ringScale.value }],
+  }));
+  const titleStyle = useAnimatedStyle(() => ({
+    opacity: titleOpacity.value,
+    transform: [{ translateY: titleY.value }],
+  }));
 
   if (!visible) return null;
 
-  const splashKeyframe = new Keyframe({
-    0: {
-      transform: [{ scale: 1 }],
-      opacity: 1,
-    },
-    20: {
-      opacity: 1,
-    },
-    70: {
-      opacity: 0,
-      easing: Easing.elastic(0.7),
-    },
-    100: {
-      opacity: 0,
-      transform: [{ scale: 1 }],
-      easing: Easing.elastic(0.7),
-    },
-  });
-
-  const image = (
-    <Image style={styles.image} source={require("@/assets/images/icon.png")} />
-  );
-
-  return animate ? (
-    <Animated.View
-      entering={splashKeyframe.duration(DURATION).withCallback((finished) => {
-        "worklet";
-        if (finished) {
-          scheduleOnRN(setVisible, false);
-        }
-      })}
-      style={styles.splashOverlay}
-    >
-      <ThemedText style={{ color: theme.text, fontSize: 40, fontWeight: 900 }}>
-        Blivap
-      </ThemedText>
+  return (
+    <Animated.View style={[styles.splashOverlay, overlayStyle]}>
+      <View style={styles.markWrap}>
+        <Animated.View style={[styles.ring, ringStyle]} />
+        <Animated.View style={logoStyle}>
+          <Image
+            style={styles.mark}
+            contentFit="contain"
+            source={require("@/assets/images/splash-mark.png")}
+          />
+        </Animated.View>
+      </View>
+      <Animated.Text style={[styles.wordmark, titleStyle]}>Blivap</Animated.Text>
     </Animated.View>
-  ) : (
-    <View
-      onLayout={() => {
-        SplashScreen.hideAsync().finally(() => {
-          setAnimate(true);
-        });
-      }}
-      style={styles.splashOverlay}
-    >
-      {image}
-    </View>
   );
 }
 
@@ -164,9 +205,34 @@ const styles = StyleSheet.create({
   },
   splashOverlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: "#960018",
+    backgroundColor: BRAND,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1000,
+  },
+  markWrap: {
+    width: 220,
+    height: 220,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ring: {
+    position: "absolute",
+    width: 196,
+    height: 196,
+    borderRadius: 98,
+    borderWidth: 1.5,
+    borderColor: "#ffffff",
+  },
+  mark: {
+    width: 96,
+    height: 188,
+  },
+  wordmark: {
+    marginTop: 8,
+    color: "#ffffff",
+    fontFamily: Fonts.inter.semiBold,
+    fontSize: 28,
+    letterSpacing: 1.2,
   },
 });

@@ -1,7 +1,7 @@
 import { useTheme } from "@/hooks/use-theme";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import { StyleSheet } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import { Donor } from "../../types/donor";
 import { RequestBloodDonationModal } from "@/components/ui/donors/request-blood-donation-modal";
 import { Button } from "./button";
@@ -82,17 +82,24 @@ export const DonorCard = ({ data, skeleton }: Card) => {
           alignItems: "flex-start",
         }}
       >
-        <ThemedText>{data?.id.slice(0, 6)}</ThemedText>
+        {data?.profileImage ? (
+          <Image source={{ uri: data.profileImage }} style={styles.avatar} />
+        ) : (
+          <ThemedView
+            style={[styles.avatar, { backgroundColor: theme.backgroundElement }]}
+          />
+        )}
 
         <ThemedView
           style={{
-            paddingHorizontal: 3,
-            borderRadius: "50%",
+            paddingHorizontal: 8,
+            paddingVertical: 2,
+            borderRadius: 999,
             backgroundColor: "#FFE2E2",
           }}
         >
           <ThemedText type="xSmall" style={{ color: theme.primary }}>
-            O+
+            {data?.bloodType}
           </ThemedText>
         </ThemedView>
       </ThemedView>
@@ -138,7 +145,29 @@ export const DonorCard = ({ data, skeleton }: Card) => {
           </ThemedView>
         </ThemedView>
 
-        <ThemedText type="xSmallMedium">₦ 150,000 per unit</ThemedText>
+        <ThemedView
+          style={[
+            styles.reimbursement,
+            {
+              backgroundColor:
+                data?.expenseCoverage === "requested" ? "#F8E8EA" : "#F3F4F6",
+            },
+          ]}
+        >
+          <ThemedText
+            type="xSmallMedium"
+            style={{
+              color:
+                data?.expenseCoverage === "requested"
+                  ? theme.primary
+                  : theme.textSecondary,
+            }}
+          >
+            {data?.expenseCoverage === "requested"
+              ? "Welfare support"
+              : "Own welfare"}
+          </ThemedText>
+        </ThemedView>
       </ThemedView>
       <ThemedText type="xSmall" style={{ color: theme.border }}>
         {data?.areaLocation.state ?? "Lagos, Nigeria"},{" "}
@@ -178,6 +207,16 @@ const styles = StyleSheet.create({
     elevation: 4,
     borderRadius: 10,
     padding: 10,
+  },
+  reimbursement: {
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
   droplet: {
     borderRadius: 15,

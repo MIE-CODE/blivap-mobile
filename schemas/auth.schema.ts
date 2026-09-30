@@ -40,3 +40,33 @@ export const otpSchema = Yup.object({
 export const forgotPasswordSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required"),
 });
+
+const strongPassword = Yup.string()
+  .min(8, "Password must be at least 8 characters")
+  .matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/,
+    "Use uppercase, lowercase, a number, and a special character",
+  )
+  .required("Password is required");
+
+export const resetPasswordSchema = Yup.object({
+  password: strongPassword,
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm your password"),
+});
+
+export const resetTokenSchema = Yup.object({
+  token: Yup.string()
+    .trim()
+    .min(16, "Paste the full reset token from your email")
+    .required("Reset token is required"),
+});
+
+export const changePasswordSchema = Yup.object({
+  oldPassword: Yup.string().required("Current password is required"),
+  password: strongPassword,
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm your password"),
+});

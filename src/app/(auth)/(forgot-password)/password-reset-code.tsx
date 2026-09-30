@@ -1,21 +1,23 @@
 import { BackBtn } from "@/components/back-btn";
 import { Button } from "@/components/button";
-import CodeInput from "@/components/code-input";
 import { Spacer } from "@/components/spacer";
+import { ThemedInput } from "@/components/themed-input";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Formik } from "formik";
 import { StyleSheet } from "react-native";
-import { otpSchema } from "../../../../schemas/auth.schema";
+import { resetTokenSchema } from "../../../../schemas/auth.schema";
 
 export default function passwordResetCode() {
-  const { loading } = useAuth();
+  const { loading, forgotPassword } = useAuth();
   const router = useRouter();
   const theme = useTheme();
-  const email = "fake@gmail.com";
+  const { email: emailParam } = useLocalSearchParams<{ email?: string }>();
+  const email = typeof emailParam === "string" ? emailParam : "";
+
   return (
     <ThemedView safe style={{ flex: 1, alignItems: "flex-start" }}>
       <Spacer height={30} />
@@ -24,35 +26,41 @@ export default function passwordResetCode() {
       <ThemedText style={styles.header}>Check your email</ThemedText>
       <Spacer height={16} />
       <ThemedText>
-        We sent a reset link to {email.split("@")[0].slice(0, 5).concat("...")}
-        @gmail.com{"\n"}enter 5 digit code that mentioned in the email
+        We sent a reset link{email ? ` to ${email}` : ""}. Open it and paste the
+        token from the link (the value after token=).
       </ThemedText>
       <Spacer height={27} />
 
       <Formik
-        initialValues={{ otp: "" }}
-        validationSchema={otpSchema}
-        onSubmit={() => router.push("/set-new-password")}
+        initialValues={{ token: "" }}
+        validationSchema={resetTokenSchema}
+        onSubmit={(values) =>
+          router.push({
+            pathname: "/set-new-password",
+            params: { token: values.token.trim() },
+          })
+        }
         validateOnMount
       >
         {({
           handleSubmit,
           values,
           handleBlur,
-          setFieldTouched,
           handleChange,
           isValid,
           touched,
           errors,
         }) => (
           <ThemedView style={{ width: "100%" }}>
-            <CodeInput
-              value={values.otp}
-              onCodeChange={handleChange("otp")}
-              onBlur={() => setFieldTouched("otp", true)}
-              error={touched.otp && errors.otp}
-              inputCount={6}
-              type="text"
+            <ThemedInput
+              label="Reset token"
+              placeholder="Paste the token from your email"
+              value={values.token}
+              onChangeText={handleChange("token")}
+              onBlur={handleBlur("token")}
+              autoCapitalize="none"
+              autoCorrect={false}
+              error={touched.token && errors.token}
             />
             <Spacer height={23} />
             <Button
@@ -61,7 +69,7 @@ export default function passwordResetCode() {
               disabled={!isValid}
               loading={loading}
             >
-              Verify Code
+              Continue
             </Button>
             <Spacer height={20} />
             <ThemedText
@@ -70,6 +78,9 @@ export default function passwordResetCode() {
             >
               Haven’t got the email yet?{" "}
               <ThemedText
+                onPress={() => {
+                  if (email) void forgotPassword(email);
+                }}
                 style={{
                   color: theme.link,
                   textDecorationLine: "underline",

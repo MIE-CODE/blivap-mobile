@@ -6,53 +6,37 @@ import { MedicalQuestionRow } from "@/components/ui/donate/medical-question-row"
 import { YesNoAnswer } from "@/components/ui/donate/yes-no-radio-group";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
-
-const MEDICAL_QUESTIONS = [
-  { id: "gender", question: "What is your gender?" },
-  { id: "age", question: "Are you between 18 and 64 years old?" },
-  { id: "weight", question: "Do you weigh less than 50 kg?" },
-  { id: "transplant", question: "Have you ever had an organ or tissue transplant?" },
-  { id: "drugs", question: "Have you ever injected drugs or doping?" },
-  { id: "diabetes", question: "Do you have diabetes?" },
-  { id: "transfusion", question: "Have you had products or a blood transfusion?" },
-] as const;
-
-type Answers = Record<(typeof MEDICAL_QUESTIONS)[number]["id"], YesNoAnswer>;
-
-const INITIAL_ANSWERS: Answers = {
-  gender: null,
-  age: null,
-  weight: null,
-  transplant: null,
-  drugs: null,
-  diabetes: null,
-  transfusion: null,
-};
+import { useEffect, useMemo } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
+import { ScreeningQuestion } from "../../../../services/questionnaire.service";
 
 type MedicalQuestionsStepProps = {
+  questions: ScreeningQuestion[];
+  answers: Record<string, YesNoAnswer>;
+  loading?: boolean;
+  onAnswer: (id: string, value: YesNoAnswer) => void;
   onValidityChange: (isValid: boolean) => void;
 };
 
 export function MedicalQuestionsStep({
+  questions,
+  answers,
+  loading = false,
+  onAnswer,
   onValidityChange,
 }: MedicalQuestionsStepProps) {
   const theme = useTheme();
-  const [answers, setAnswers] = useState<Answers>(INITIAL_ANSWERS);
 
   const allAnswered = useMemo(
-    () => MEDICAL_QUESTIONS.every((item) => answers[item.id] !== null),
-    [answers],
+    () =>
+      questions.length > 0 &&
+      questions.every((item) => answers[item.id] === "yes" || answers[item.id] === "no"),
+    [answers, questions],
   );
 
   useEffect(() => {
     onValidityChange(allAnswered);
   }, [allAnswered, onValidityChange]);
-
-  const handleAnswerChange = (id: keyof Answers, value: YesNoAnswer) => {
-    setAnswers((current) => ({ ...current, [id]: value }));
-  };
 
   return (
     <ScrollView
@@ -69,23 +53,32 @@ export function MedicalQuestionsStep({
       <ConfidentialityNote />
       <Spacer height={20} />
 
-      <ThemedView style={[styles.questionnaireCard, { shadowColor: theme.text }]}>
-        <ThemedText style={styles.cardTitle}>
-          Please complete the questions
-        </ThemedText>
+      {loading ? (
+        <ActivityIndicator color={theme.primary} />
+      ) : (
+        <ThemedView style={[styles.questionnaireCard, { shadowColor: theme.text }]}>
+          <ThemedText style={styles.cardTitle}>
+            Please complete the questions
+          </ThemedText>
 
-        <ThemedView style={styles.questions}>
-          {MEDICAL_QUESTIONS.map((item, index) => (
-            <MedicalQuestionRow
-              key={item.id}
-              question={item.question}
-              value={answers[item.id]}
-              onChange={(value) => handleAnswerChange(item.id, value)}
-              showDivider={index < MEDICAL_QUESTIONS.length - 1}
-            />
-          ))}
+          <ThemedView style={styles.questions}>
+            {questions.map((item, index) => (
+              <MedicalQuestionRow
+                key={item.id}
+                question={item.text}
+                value={answers[item.id] ?? null}
+                onChange={(value) => onAnswer(item.id, value)}
+                showDivider={index < questions.length - 1}
+              />
+            ))}
+            {!questions.length ? (
+              <ThemedText style={{ color: theme.textSecondary }}>
+                Save your details to load the screening questions.
+              </ThemedText>
+            ) : null}
+          </ThemedView>
         </ThemedView>
-      </ThemedView>
+      )}
     </ScrollView>
   );
 }

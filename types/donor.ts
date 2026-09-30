@@ -42,6 +42,8 @@ export type Donor = {
   eligibilityStatus: EligibilityStatus;
   isActiveDonor: boolean;
   lastDonationAt: string;
+  /** `requested` wants expenses covered. `self` covers their own. */
+  expenseCoverage?: "requested" | "self";
   averageRating: number;
   ratingCount: number;
   profileImage: string;

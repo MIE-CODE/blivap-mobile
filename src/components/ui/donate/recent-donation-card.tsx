@@ -11,9 +11,10 @@ export type RecentDonation = {
   bloodType: string;
   packs: number;
   date: string;
-  amount: number;
+  amount?: number;
   location: string;
   status: "completed" | "pending";
+  title?: string;
 };
 
 type RecentDonationCardProps = {
@@ -27,15 +28,20 @@ export function RecentDonationCard({ donation }: RecentDonationCardProps) {
     <ThemedView style={[styles.card, { shadowColor: theme.text }]}>
       <ThemedView style={styles.topRow}>
         <ThemedView style={styles.leftGroup}>
-          <ThemedView style={[styles.bloodTypeBadge, { borderColor: theme.primary }]}>
-            <ThemedText style={[styles.bloodTypeText, { color: theme.primary }]}>
+          <ThemedView
+            style={[styles.bloodTypeBadge, { borderColor: theme.primary }]}
+          >
+            <ThemedText
+              style={[styles.bloodTypeText, { color: theme.primary }]}
+            >
               {donation.bloodType}
             </ThemedText>
           </ThemedView>
 
           <ThemedView style={styles.details}>
             <ThemedText style={styles.title}>
-              {donation.packs} Pack{donation.packs > 1 ? "s" : ""} Donated
+              {donation.title ??
+                `${donation.packs} Pack${donation.packs > 1 ? "s" : ""} Donated`}
             </ThemedText>
             <ThemedText style={[styles.date, { color: theme.textSecondary }]}>
               {donation.date}
@@ -43,9 +49,11 @@ export function RecentDonationCard({ donation }: RecentDonationCardProps) {
           </ThemedView>
         </ThemedView>
 
-        <ThemedText style={[styles.amount, { color: theme.primary }]}>
-          {formatNaira(donation.amount)}
-        </ThemedText>
+        {donation.amount != null ? (
+          <ThemedText style={[styles.amount, { color: theme.primary }]}>
+            {formatNaira(donation.amount)}
+          </ThemedText>
+        ) : null}
       </ThemedView>
 
       <ThemedView style={styles.bottomRow}>

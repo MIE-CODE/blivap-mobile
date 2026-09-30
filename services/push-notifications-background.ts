@@ -1,5 +1,8 @@
 import { Platform } from "react-native";
 import { getFirebaseMessagingModule, isFirebaseConfigured } from "./firebase";
+
+/** PNG of https://blivap.com/bimi/blivap-bimi.svg. Android cannot render the SVG. */
+const PUSH_NOTIFICATION_IMAGE_URL = "https://blivap.com/icon1.png";
 import { getNotifee } from "./notifee";
 import { pushLog, pushLogError } from "./push-log";
 
@@ -67,8 +70,20 @@ async function handleBackgroundMessage(remoteMessage: RemoteMessage) {
       android: {
         channelId: ANDROID_CHANNEL_ID,
         pressAction: { id: "default" },
+        largeIcon:
+          (typeof data.image === "string" && data.image) ||
+          PUSH_NOTIFICATION_IMAGE_URL,
       },
-      ios: { sound: "default" },
+      ios: {
+        sound: "default",
+        attachments: [
+          {
+            url:
+              (typeof data.image === "string" && data.image) ||
+              PUSH_NOTIFICATION_IMAGE_URL,
+          },
+        ],
+      },
     });
     pushLog("info", "message.background.display_success", {
       messageId: remoteMessage.messageId,

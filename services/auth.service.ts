@@ -1,8 +1,11 @@
 import { IAuthResponse, IResponse } from "../types/api-response";
 import {
+  IChangePassword,
+  IForgotPassword,
   ILogin,
   IOtp,
   IRegister,
+  IResetPassword,
   IUpdateUser,
   IVerifyNin,
 } from "../types/user";
@@ -48,6 +51,40 @@ export default () => {
         method: "POST",
         body: JSON.stringify(payload),
       });
+    },
+    async forgotPassword(
+      payload: IForgotPassword,
+    ): Promise<IResponse<{ message?: string }>> {
+      return await api("/authentication/forgot-password", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    },
+    async resetPassword(
+      payload: IResetPassword,
+    ): Promise<IResponse<{ message?: string }>> {
+      return await api("/authentication/reset-password", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    },
+    async changePassword(
+      payload: IChangePassword,
+    ): Promise<IResponse<{ message?: string }>> {
+      return await api("/authentication/change-password", {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+    },
+    async resendEmailVerification(email: string): Promise<IResponse<{ message?: string }>> {
+      const query = new URLSearchParams({ email });
+      return await api(
+        `/authentication/resend-email-verification-link?${query.toString()}`,
+        { method: "POST" },
+      );
+    },
+    async logout(): Promise<IResponse<unknown>> {
+      return await api("/authentication/logout", { method: "POST" });
     },
   };
 };

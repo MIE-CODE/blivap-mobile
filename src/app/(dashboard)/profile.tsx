@@ -9,7 +9,10 @@ import { ProfileStatCard } from "@/components/ui/profile/profile-stat-card";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet } from "react-native";
+import { ApiError } from "../../../services/fetcher";
+import { $api } from "../../../services/api-client";
 import { useAppSelector } from "../../../stores/hooks";
 
 const SETTINGS_ITEMS = [
@@ -43,11 +46,41 @@ const SETTINGS_ITEMS = [
     icon: "help-circle" as const,
     href: "/settings/help-support",
   },
-];
+] as const;
 
 export default function Profile() {
   const { user } = useAppSelector((s) => s.auth);
   const theme = useTheme();
+  const [bloodType, setBloodType] = useState("Not registered");
+  const [completedDonations, setCompletedDonations] = useState("0");
+
+  useEffect(() => {
+    let active = true;
+    void $api.donors
+      .me()
+      .then((res) => {
+        if (!active || !res.data) return;
+        const profile = res.data;
+        const type = profile.bloodType;
+        if (typeof type === "string" && type) setBloodType(`${type} Blood Group`);
+        const reliability = profile.reliability;
+        const completed =
+          reliability &&
+          typeof reliability === "object" &&
+          "completedBookings" in reliability
+            ? Number(reliability.completedBookings)
+            : null;
+        if (completed != null && Number.isFinite(completed)) {
+          setCompletedDonations(String(completed));
+        }
+      })
+      .catch((error) => {
+        if (error instanceof ApiError && error.status === 404) return;
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const displayName =
     [user?.firstname, user?.lastname].filter(Boolean).join(" ") || "Will";
@@ -77,13 +110,13 @@ export default function Profile() {
             style={[styles.bloodGroupBadge, { backgroundColor: theme.primary }]}
           >
             <ThemedText style={styles.bloodGroupText}>
-              O+ Blood Group
+              {bloodType}
             </ThemedText>
           </ThemedView>
         </ThemedView>
 
         <ThemedView style={styles.statsRow}>
-          <ProfileStatCard value="12" label="Total Donations" />
+          <ProfileStatCard value={completedDonations} label="Total Donations" />
           <ProfileStatCard
             value="2,500"
             label="Blood Points"

@@ -5,14 +5,17 @@ import { ThemedInput } from "@/components/themed-input";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/hooks/use-auth";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Formik } from "formik";
 import { StyleSheet } from "react-native";
-import { forgotPasswordSchema } from "../../../../schemas/auth.schema";
+import { resetPasswordSchema } from "../../../../schemas/auth.schema";
 
 export default function setNewPassword() {
-  const { loading } = useAuth();
+  const { loading, resetPassword } = useAuth();
   const router = useRouter();
+  const { token: tokenParam } = useLocalSearchParams<{ token?: string }>();
+  const token = typeof tokenParam === "string" ? tokenParam : "";
+
   return (
     <ThemedView safe style={{ flex: 1, alignItems: "flex-start" }}>
       <Spacer height={30} />
@@ -25,52 +28,61 @@ export default function setNewPassword() {
       </ThemedText>
       <Spacer height={27} />
 
-      <Formik
-        initialValues={{ email: "" }}
-        validationSchema={forgotPasswordSchema}
-        onSubmit={() => router.push("/success")}
-        validateOnMount
-      >
-        {({
-          handleSubmit,
-          values,
-          handleBlur,
-          handleChange,
-          isValid,
-          touched,
-          errors,
-        }) => (
-          <ThemedView style={{ width: "100%" }}>
-            <ThemedInput
-              label="Password"
-              placeholder="Enter your new password"
-              value={values.email}
-              onChangeText={handleChange("email")}
-              onBlur={handleBlur("email")}
-              error={touched.email && errors.email}
-            />
-            <Spacer height={17} />
-            <ThemedInput
-              label="Confirm Password"
-              placeholder="Re-enter password"
-              value={values.email}
-              onChangeText={handleChange("email")}
-              onBlur={handleBlur("email")}
-              error={touched.email && errors.email}
-            />
-            <Spacer height={28} />
-            <Button
-              size="large"
-              onPress={() => handleSubmit()}
-              disabled={!isValid}
-              loading={loading}
-              style={{ borderRadius: 10 }}
-            >
-              Update Password
-            </Button>
-          </ThemedView>
-        )}
-      </Formik>
+      {!token ? (
+        <ThemedText>
+          This reset is missing a token. Request a new email and paste the token
+          from the link.
+        </ThemedText>
+      ) : (
+        <Formik
+          initialValues={{ password: "", confirmPassword: "" }}
+          validationSchema={resetPasswordSchema}
+          onSubmit={(values) => resetPassword(token, values.password)}
+          validateOnMount
+        >
+          {({
+            handleSubmit,
+            values,
+            handleBlur,
+            handleChange,
+            isValid,
+            touched,
+            errors,
+          }) => (
+            <ThemedView style={{ width: "100%" }}>
+              <ThemedInput
+                label="Password"
+                placeholder="Enter your new password"
+                isPassword
+                value={values.password}
+                onChangeText={handleChange("password")}
+                onBlur={handleBlur("password")}
+                error={touched.password && errors.password}
+              />
+              <Spacer height={17} />
+              <ThemedInput
+                label="Confirm Password"
+                placeholder="Re-enter password"
+                isPassword
+                value={values.confirmPassword}
+                onChangeText={handleChange("confirmPassword")}
+                onBlur={handleBlur("confirmPassword")}
+                error={touched.confirmPassword && errors.confirmPassword}
+              />
+              <Spacer height={28} />
+              <Button
+                size="large"
+                onPress={() => handleSubmit()}
+                disabled={!isValid}
+                loading={loading}
+                style={{ borderRadius: 10 }}
+              >
+                Update Password
+              </Button>
+            </ThemedView>
+          )}
+        </Formik>
+      )}
     </ThemedView>
   );
 }

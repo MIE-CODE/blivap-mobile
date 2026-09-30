@@ -1,8 +1,10 @@
 import { Button } from "@/components/button";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { WelfareBreakdown } from "@/components/ui/donate/welfare-breakdown";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { WelfareView } from "@/utils/welfare";
 import { Feather } from "@expo/vector-icons";
 import { Image, Pressable, StyleSheet } from "react-native";
 
@@ -15,6 +17,7 @@ export type PendingDonationRequest = {
   location: string;
   description: string;
   urgent?: boolean;
+  welfare?: WelfareView;
 };
 
 type PendingRequestCardProps = {
@@ -34,10 +37,14 @@ export function PendingRequestCard({
     <ThemedView style={[styles.card, { borderColor: "#E5E7EB" }]}>
       <ThemedView style={styles.headerRow}>
         <ThemedView style={styles.requesterInfo}>
-          <Image
-            source={{ uri: request.requesterAvatar }}
-            style={styles.avatar}
-          />
+          {request.requesterAvatar ? (
+            <Image
+              source={{ uri: request.requesterAvatar }}
+              style={styles.avatar}
+            />
+          ) : (
+            <ThemedView style={[styles.avatar, { backgroundColor: theme.backgroundElement }]} />
+          )}
           <ThemedView style={styles.nameBlock}>
             <ThemedText style={styles.name}>{request.requesterName}</ThemedText>
             <ThemedText style={[styles.requestedAt, { color: theme.textSecondary }]}>
@@ -70,6 +77,8 @@ export function PendingRequestCard({
       <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
         {request.description}
       </ThemedText>
+
+      {request.welfare ? <WelfareBreakdown welfare={request.welfare} /> : null}
 
       <ThemedView style={styles.actions}>
         <Pressable

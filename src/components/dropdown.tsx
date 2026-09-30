@@ -2,7 +2,7 @@ import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { Entypo } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { ThemedIcon } from "./themed-icon";
 import { ThemedText } from "./themed-text";
 import { ThemedView } from "./themed-view";
@@ -20,6 +20,7 @@ type DropdownProps = {
   onChange: (value: string) => void;
   onBlur?: () => void;
   error?: unknown;
+  style?: StyleProp<ViewStyle>;
 };
 
 function formatError(error: unknown): string | null {
@@ -39,6 +40,7 @@ export const Dropdown = ({
   onChange,
   onBlur,
   error,
+  style,
   ...props
 }: DropdownProps) => {
   const theme = useTheme();
@@ -48,7 +50,7 @@ export const Dropdown = ({
   const errorMessage = formatError(error);
 
   return (
-    <ThemedView style={{ gap: 6, flex: 1, position: "relative", zIndex: open ? 20 : 1 }}>
+    <ThemedView style={[{ gap: 6, position: "relative", zIndex: open ? 20 : 1 }, style]}>
       {label && (
         <ThemedText style={{ fontSize: 13, color: theme.textSecondary }}>
           {label}
@@ -67,10 +69,12 @@ export const Dropdown = ({
         {...props}
       >
         <ThemedText
+          numberOfLines={1}
           style={{
+            flex: 1,
             color: selected ? theme.text : theme.textSecondary,
-            fontFamily: Fonts.inter.semiBold,
-            fontSize: 16,
+            fontFamily: Fonts.inter.medium,
+            fontSize: 14,
           }}
         >
           {selected ? selected.label : placeholder}
@@ -123,10 +127,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 8,
     borderRadius: 10,
     borderWidth: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    minHeight: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
   },
   sheet: {
     paddingVertical: 8,

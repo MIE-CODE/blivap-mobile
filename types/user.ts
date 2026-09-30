@@ -46,3 +46,17 @@ export interface IUpdateUser {
 export interface IVerifyNin {
   nin: string;
 }
+
+export interface IForgotPassword {
+  email: string;
+}
+
+export interface IResetPassword {
+  resetToken: string;
+  password: string;
+}
+
+export interface IChangePassword {
+  oldPassword: string;
+  password: string;
+}
