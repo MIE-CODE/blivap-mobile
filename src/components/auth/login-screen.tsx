@@ -14,7 +14,7 @@ import { Pressable, StyleSheet } from "react-native";
 import { LoginSchema } from "../../../schemas/auth.schema";
 
 export function LoginScreen() {
-  const { login, loading } = useAuth();
+  const { login, loading, signInWithSocial } = useAuth();
 
   return (
     <ThemedView safe style={styles.container}>
@@ -107,6 +107,11 @@ export function LoginScreen() {
       <Spacer height={16} />
       <ThemedView style={styles.socialButtonsContainer}>
         <Pressable
+          accessibilityLabel="Continue with Facebook"
+          disabled={loading}
+          onPress={() => {
+            void signInWithSocial("facebook");
+          }}
           style={[
             styles.socialButton,
             { paddingHorizontal: 16, paddingVertical: 13.9 },
@@ -115,6 +120,11 @@ export function LoginScreen() {
           <FacebookIcon />
         </Pressable>
         <Pressable
+          accessibilityLabel="Continue with Google"
+          disabled={loading}
+          onPress={() => {
+            void signInWithSocial("google");
+          }}
           style={[
             styles.socialButton,
             { paddingHorizontal: 17, paddingVertical: 8 },
@@ -123,6 +133,11 @@ export function LoginScreen() {
           <GoogleIcon />
         </Pressable>
         <Pressable
+          accessibilityLabel="Continue with Apple"
+          disabled={loading}
+          onPress={() => {
+            void signInWithSocial("apple");
+          }}
           style={[
             styles.socialButton,
             { paddingHorizontal: 18.5, paddingVertical: 14 },

@@ -31,7 +31,7 @@ export const api = async <T = unknown>(
   if (!res.ok) {
     const errorBody = await res.json().catch(() => null);
 
-    if (res.status === 401) {
+    if (res.status === 401 && token) {
       await clearAuthToken();
       store.dispatch(logout());
       Toast.show({

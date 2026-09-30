@@ -5,6 +5,11 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
 import { $api } from "../../services/api-client";
+import {
+  firebaseIdToken,
+  isSocialCancelled,
+  SocialProvider,
+} from "../../services/social-auth";
 import { clearAuthToken, saveAuthToken } from "../../services/auth-storage";
 import { redirectToLogin } from "../../services/navigation";
 import { registerForPushNotifications } from "../../services/push-notifications";
@@ -63,6 +68,28 @@ export const useAuth = () => {
       Toast.show({
         type: "error",
         text1: getErrorMessage(e, "NIN verification failed"),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithSocial = async (provider: SocialProvider) => {
+    try {
+      setLoading(true);
+      const idToken = await firebaseIdToken(provider);
+      const res = await $api.auth.social({ idToken });
+      const { user, accessToken: token } = res.data;
+      await saveAuthToken(token);
+      dispatch(setCredentials({ user, token }));
+      registerPushInBackground();
+      Toast.show({ type: "success", text1: "Signed In" });
+      router.replace(getPostAuthRoute(user));
+    } catch (e) {
+      if (isSocialCancelled(e)) return;
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(e, "Could not sign in"),
       });
     } finally {
       setLoading(false);
@@ -221,6 +248,7 @@ export const useAuth = () => {
   return {
     register,
     login,
+    signInWithSocial,
     verifyOtp,
     verifyNin,
     me,

@@ -19,6 +19,14 @@ export default () => {
         body: JSON.stringify(payload),
       });
     },
+    async social(payload: {
+      idToken: string;
+    }): Promise<IResponse<IAuthResponse>> {
+      return await api("/authentication/social", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    },
     async register(
       payload: Omit<IRegister, "termsAndCondition" | "privacyPolicy">,
     ): Promise<IResponse<IAuthResponse>> {

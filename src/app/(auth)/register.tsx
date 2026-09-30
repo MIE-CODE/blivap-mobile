@@ -18,7 +18,7 @@ import { Formik } from "formik";
 import { ScrollView } from "react-native-gesture-handler";
 import { RegisterSchema } from "../../../schemas/auth.schema";
 export default function Register() {
-  const { register, loading } = useAuth();
+  const { register, loading, signInWithSocial } = useAuth();
   const theme = useTheme();
   return (
     <ThemedView safe style={{ paddingBottom: 20 }}>
@@ -220,6 +220,11 @@ export default function Register() {
         <Spacer height={16} />
         <ThemedView style={styles.socialButtonsContainer}>
           <Pressable
+            accessibilityLabel="Continue with Facebook"
+            disabled={loading}
+            onPress={() => {
+              void signInWithSocial("facebook");
+            }}
             style={[
               styles.socialButton,
               { paddingHorizontal: 16, paddingVertical: 13.9 },
@@ -228,6 +233,11 @@ export default function Register() {
             <FacebookIcon />
           </Pressable>
           <Pressable
+            accessibilityLabel="Continue with Google"
+            disabled={loading}
+            onPress={() => {
+              void signInWithSocial("google");
+            }}
             style={[
               styles.socialButton,
               { paddingHorizontal: 17, paddingVertical: 8 },
@@ -236,6 +246,11 @@ export default function Register() {
             <GoogleIcon />
           </Pressable>
           <Pressable
+            accessibilityLabel="Continue with Apple"
+            disabled={loading}
+            onPress={() => {
+              void signInWithSocial("apple");
+            }}
             style={[
               styles.socialButton,
               { paddingHorizontal: 18.5, paddingVertical: 14 },
