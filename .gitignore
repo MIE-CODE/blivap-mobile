@@ -63,6 +63,7 @@ jest-cache/
 *.p12
 google-services.json
 GoogleService-Info.plist
+blivap-firebase-adminsdk-*.json
 credentials.json
 secrets/
 *.secret
