@@ -11,7 +11,7 @@ import { WalletAmountCard } from "@/components/ui/wallet/wallet-amount-card";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { formatNaira, parseAmountInput } from "@/utils/currency";
-import { router } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { useState } from "react";
 import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 
@@ -35,7 +35,7 @@ export default function Withdraw() {
   const handleConfirm = () => {
     if (amount <= 0) return;
 
-    router.push({
+    openRoute({
       pathname: "/withdraw-confirm",
       params: { amount: String(amount) },
     });
@@ -59,7 +59,12 @@ export default function Withdraw() {
           <ThemedText style={[styles.sectionLabel, { color: theme.textSecondary }]}>
             Enter Amount
           </ThemedText>
-          <View style={[styles.amountInputWrap, { borderColor: theme.primary }]}>
+          <View
+            style={[
+              styles.amountInputWrap,
+              { borderColor: theme.primary, backgroundColor: theme.card },
+            ]}
+          >
             <TextInput
               value={displayAmount}
               onChangeText={handleAmountChange}

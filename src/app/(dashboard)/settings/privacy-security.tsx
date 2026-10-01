@@ -11,7 +11,7 @@ import {
 import { Fonts } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { router } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { changePasswordSchema } from "../../../../schemas/auth.schema";
@@ -118,7 +118,7 @@ export default function PrivacySecurity() {
         <Spacer height={10} />
         <SettingsSectionLabel title="Danger Zone" />
         <SettingsCard>
-          <Pressable onPress={() => router.push("/settings/delete-account")}>
+          <Pressable onPress={() => openRoute("/settings/delete-account")}>
             <ThemedView style={styles.dangerRow}>
               <ThemedText style={[styles.dangerText, { color: theme.primary }]}>
                 Delete Account

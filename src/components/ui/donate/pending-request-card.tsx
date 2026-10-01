@@ -34,7 +34,12 @@ export function PendingRequestCard({
   const theme = useTheme();
 
   return (
-    <ThemedView style={[styles.card, { borderColor: "#E5E7EB" }]}>
+    <ThemedView
+      style={[
+        styles.card,
+        { backgroundColor: theme.card, borderColor: theme.hairline },
+      ]}
+    >
       <ThemedView style={styles.headerRow}>
         <ThemedView style={styles.requesterInfo}>
           {request.requesterAvatar ? (

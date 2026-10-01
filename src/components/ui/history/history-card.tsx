@@ -13,7 +13,7 @@ export const HistoryCard = () => {
       style={{
         padding: 10,
         shadowOpacity: 0.5,
-        backgroundColor: theme.background,
+        backgroundColor: theme.card,
         shadowOffset: { width: 0, height: 0 },
         elevation: 4,
         shadowRadius: 2,
@@ -25,13 +25,18 @@ export const HistoryCard = () => {
       <ThemedView
         style={{
           shadowColor: theme.text,
-          backgroundColor: theme.background,
+          backgroundColor: theme.card,
           flexDirection: "row",
           alignItems: "center",
           gap: 13,
         }}
       >
-        <ThemedView style={[styles.wIcon, { borderColor: theme.primary }]}>
+        <ThemedView
+          style={[
+            styles.wIcon,
+            { borderColor: theme.primary, backgroundColor: theme.tint },
+          ]}
+        >
           <Droplets />
         </ThemedView>
         <ThemedView

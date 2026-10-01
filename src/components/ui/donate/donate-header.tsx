@@ -5,6 +5,7 @@ import { ThemedView } from "@/components/themed-view";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { router } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { Pressable, StyleSheet } from "react-native";
 
 type DonateHeaderProps = {
@@ -23,7 +24,7 @@ export function DonateHeader({ title = "Donate", onBack }: DonateHeaderProps) {
       </ThemedText>
       <Pressable
         style={[styles.notificationBtn, { borderColor: theme.border }]}
-        onPress={() => router.push("/notification")}
+        onPress={() => openRoute("/notification")}
       >
         <NotificationsIcon color={theme.text} width={22} height={22} />
       </Pressable>

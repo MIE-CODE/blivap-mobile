@@ -18,7 +18,9 @@ export const ProfileStatCard = ({
   const theme = useTheme();
 
   return (
-    <ThemedView style={[styles.card, { shadowColor: theme.text }]}>
+    <ThemedView
+      style={[styles.card, { backgroundColor: theme.card, shadowColor: theme.shadow }]}
+    >
       <ThemedText
         style={[
           styles.value,

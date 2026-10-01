@@ -69,7 +69,12 @@ export default function WithdrawConfirm() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <ThemedView style={[styles.summaryCard, { borderColor: theme.primary }]}>
+        <ThemedView
+          style={[
+            styles.summaryCard,
+            { backgroundColor: theme.card, borderColor: theme.primary },
+          ]}
+        >
           <ThemedText style={[styles.summaryAmount, { color: theme.primary }]}>
             {formattedAmount}
           </ThemedText>
@@ -84,7 +89,12 @@ export default function WithdrawConfirm() {
           </ThemedText>
         </ThemedView>
 
-        <ThemedView style={[styles.detailsCard, { shadowColor: theme.text }]}>
+        <ThemedView
+          style={[
+            styles.detailsCard,
+            { backgroundColor: theme.card, shadowColor: theme.shadow },
+          ]}
+        >
           <ThemedText style={styles.detailsTitle}>Transaction Details</ThemedText>
           <DetailRow label="Source Wallet" value="Donor Wallet" />
           <DetailRow

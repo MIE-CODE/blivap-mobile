@@ -143,8 +143,8 @@ export function PersonalDataStep({
                   style={[
                     styles.expenseOption,
                     {
-                      borderColor: selected ? theme.primary : "#D1D5DB",
-                      backgroundColor: selected ? "#F8E8EA" : "#FFFFFF",
+                      borderColor: selected ? theme.primary : theme.hairline,
+                      backgroundColor: selected ? theme.tint : theme.card,
                     },
                   ]}
                 >
@@ -152,8 +152,8 @@ export function PersonalDataStep({
                     style={[
                       styles.expenseRadio,
                       {
-                        borderColor: selected ? theme.primary : "#D1D5DB",
-                        backgroundColor: selected ? theme.primary : "#FFFFFF",
+                        borderColor: selected ? theme.primary : theme.hairline,
+                        backgroundColor: selected ? theme.primary : theme.card,
                       },
                     ]}
                   />
@@ -197,7 +197,9 @@ export function PersonalDataStep({
           onChangeText={(value) => update("correspondenceName", value)}
         />
 
-        <ThemedView style={styles.emailHighlight}>
+        <ThemedView
+          style={[styles.emailHighlight, { backgroundColor: theme.tint }]}
+        >
           <ThemedText style={styles.emailLabel}>Email address</ThemedText>
           <ThemedText
             style={[styles.emailHint, { color: theme.textSecondary }]}

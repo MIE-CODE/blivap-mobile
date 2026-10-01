@@ -39,7 +39,7 @@ export default function resolved() {
           style={{
             height: "40%",
             marginTop: "auto",
-            backgroundColor: "white",
+            backgroundColor: theme.card,
             borderRadius: 20,
             paddingVertical: 16,
             paddingHorizontal: 36,
@@ -56,7 +56,7 @@ export default function resolved() {
           justifyContent: "space-between",
         }}
       >
-        <Arrow color="black" onPress={() => router.back()} />
+        <Arrow color={theme.text} onPress={() => router.back()} />
 
         <ThemedText>Withdraw To Bank Account</ThemedText>
         <Spacer width={40} />
@@ -96,7 +96,7 @@ export default function resolved() {
           shadowOffset: { width: 0, height: 0 },
           shadowRadius: 2,
           shadowColor: "#00000026",
-          backgroundColor: "white",
+          backgroundColor: theme.card,
           elevation: 4,
           shadowOpacity: 1,
           paddingVertical: 21,
@@ -116,7 +116,11 @@ export default function resolved() {
         </ThemedText>
         <Spacer height={38} />
         <TextInput
-          style={{ fontSize: 20, fontFamily: Fonts.poppins.medium }}
+          style={{
+            fontSize: 20,
+            fontFamily: Fonts.poppins.medium,
+            color: theme.text,
+          }}
           value={`N ${value.toLocaleString()}.00`}
         />
         <Spacer height={24} />
@@ -128,7 +132,7 @@ export default function resolved() {
                 paddingHorizontal: 16,
                 paddingVertical: 10,
                 borderRadius: 10,
-                backgroundColor: isActive === i ? theme.primary : "#F6F6F6",
+                backgroundColor: isActive === i ? theme.primary : theme.muted,
                 width: "31%",
               }}
               onPress={() => changeValue(i)}
@@ -137,7 +141,7 @@ export default function resolved() {
                 style={{
                   fontSize: 12,
                   fontWeight: 500,
-                  color: isActive === i ? "white" : "#6B7280",
+                  color: isActive === i ? "white" : theme.textSecondary,
                   textAlign: "center",
                 }}
               >

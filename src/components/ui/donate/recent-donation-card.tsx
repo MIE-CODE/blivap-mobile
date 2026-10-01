@@ -14,6 +14,7 @@ export type RecentDonation = {
   amount?: number;
   location: string;
   status: "completed" | "pending";
+  statusLabel?: string;
   title?: string;
 };
 
@@ -25,7 +26,12 @@ export function RecentDonationCard({ donation }: RecentDonationCardProps) {
   const theme = useTheme();
 
   return (
-    <ThemedView style={[styles.card, { shadowColor: theme.text }]}>
+    <ThemedView
+      style={[
+        styles.card,
+        { backgroundColor: theme.card, shadowColor: theme.shadow },
+      ]}
+    >
       <ThemedView style={styles.topRow}>
         <ThemedView style={styles.leftGroup}>
           <ThemedView
@@ -68,13 +74,25 @@ export function RecentDonationCard({ donation }: RecentDonationCardProps) {
         </ThemedView>
 
         <ThemedView style={styles.statusRow}>
-          <ThemedView style={styles.statusIcon}>
-            <Ionicons name="checkmark" size={10} color="#FFFFFF" />
-          </ThemedView>
+          {donation.status === "completed" ? (
+            <ThemedView style={styles.statusIcon}>
+              <Ionicons name="checkmark" size={10} color="#FFFFFF" />
+            </ThemedView>
+          ) : null}
           <ThemedText
-            style={[styles.statusText, { color: theme.status.success }]}
+            style={[
+              styles.statusText,
+              {
+                color:
+                  donation.status === "completed"
+                    ? theme.status.success
+                    : theme.textSecondary,
+                textTransform: "capitalize",
+              },
+            ]}
           >
-            Completed
+            {donation.statusLabel ??
+              (donation.status === "completed" ? "Completed" : "Pending")}
           </ThemedText>
         </ThemedView>
       </ThemedView>

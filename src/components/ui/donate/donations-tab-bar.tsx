@@ -4,23 +4,25 @@ import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { Pressable, StyleSheet } from "react-native";
 
-export type DonationsTab = "history" | "pending";
+export type DonationsTab = "history" | "confirmed" | "pending";
 
 type DonationsTabBarProps = {
   activeTab: DonationsTab;
   pendingCount: number;
+  confirmedCount: number;
   onTabChange: (tab: DonationsTab) => void;
 };
 
 export function DonationsTabBar({
   activeTab,
   pendingCount,
+  confirmedCount,
   onTabChange,
 }: DonationsTabBarProps) {
   const theme = useTheme();
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { borderBottomColor: theme.hairline }]}>
       <Pressable
         style={styles.tab}
         onPress={() => onTabChange("history")}
@@ -46,6 +48,36 @@ export function DonationsTabBar({
         ) : null}
       </Pressable>
 
+      <Pressable style={styles.tab} onPress={() => onTabChange("confirmed")}>
+        <ThemedView style={styles.pendingLabelRow}>
+          <ThemedText
+            style={[
+              styles.tabLabel,
+              {
+                color:
+                  activeTab === "confirmed" ? theme.primary : theme.textSecondary,
+                fontFamily:
+                  activeTab === "confirmed"
+                    ? Fonts.inter.semiBold
+                    : Fonts.inter.regular,
+              },
+            ]}
+          >
+            Confirmed
+          </ThemedText>
+          {confirmedCount > 0 ? (
+            <ThemedView style={[styles.badge, { backgroundColor: "#166534" }]}>
+              <ThemedText style={styles.badgeText}>{confirmedCount}</ThemedText>
+            </ThemedView>
+          ) : null}
+        </ThemedView>
+        {activeTab === "confirmed" ? (
+          <ThemedView
+            style={[styles.activeIndicator, { backgroundColor: theme.primary }]}
+          />
+        ) : null}
+      </Pressable>
+
       <Pressable
         style={styles.tab}
         onPress={() => onTabChange("pending")}
@@ -64,7 +96,7 @@ export function DonationsTabBar({
               },
             ]}
           >
-            Pending Requests
+            Pending
           </ThemedText>
           {pendingCount > 0 ? (
             <ThemedView

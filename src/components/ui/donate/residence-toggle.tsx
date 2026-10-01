@@ -27,8 +27,8 @@ function ToggleOption({
       style={[
         styles.option,
         {
-          borderColor: selected ? theme.primary : "#D1D5DB",
-          backgroundColor: "#FFFFFF",
+          borderColor: selected ? theme.primary : theme.hairline,
+          backgroundColor: theme.card,
         },
       ]}
       onPress={onPress}

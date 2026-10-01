@@ -40,7 +40,7 @@ export function MedicalQuestionRow({
       <YesNoRadioGroup value={value} onChange={onChange} />
 
       {showDivider ? (
-        <Line strokeWidth={1} strokeColor="#E5E7EB" style={styles.divider} />
+        <Line strokeWidth={1} strokeColor={theme.hairline} style={styles.divider} />
       ) : null}
     </ThemedView>
   );

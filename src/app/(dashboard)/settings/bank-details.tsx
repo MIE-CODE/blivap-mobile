@@ -28,7 +28,12 @@ export default function BankDetails() {
     >
       <ThemedView style={styles.section}>
         <SettingsSectionLabel title="Active Direct Deposit Account" />
-        <ThemedView style={[styles.activeCard, { borderColor: theme.border }]}>
+        <ThemedView
+          style={[
+            styles.activeCard,
+            { backgroundColor: theme.card, borderColor: theme.hairline },
+          ]}
+        >
           <ThemedView style={styles.activeHeader}>
             <ThemedView style={styles.bankRow}>
               <ThemedView style={[styles.bankIcon, { backgroundColor: "#FFE2E2" }]}>
@@ -42,7 +47,7 @@ export default function BankDetails() {
               </ThemedText>
             </ThemedView>
           </ThemedView>
-          <Line strokeWidth={1} strokeColor="#E5E7EB" />
+          <Line strokeWidth={1} strokeColor={theme.hairline} />
           <ThemedView style={styles.metaBlock}>
             <ThemedText style={[styles.metaLabel, { color: theme.textSecondary }]}>
               ACCOUNT NUMBER
@@ -101,7 +106,7 @@ export default function BankDetails() {
             <Switch
               value={primary}
               onValueChange={setPrimary}
-              trackColor={{ false: "#E0E0E0", true: theme.primary }}
+              trackColor={{ false: theme.muted, true: theme.primary }}
               thumbColor="#ffffff"
             />
           </ThemedView>

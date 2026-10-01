@@ -25,9 +25,12 @@ export const BankAccountSelect = ({
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.card, { borderColor: theme.primary }]}
+      style={[
+        styles.card,
+        { borderColor: theme.primary, backgroundColor: theme.card },
+      ]}
     >
-      <ThemedView style={[styles.iconWrap, { backgroundColor: "#FFE2E2" }]}>
+      <ThemedView style={[styles.iconWrap, { backgroundColor: theme.tint }]}>
         <Feather name="home" size={18} color={theme.primary} />
       </ThemedView>
       <ThemedView style={styles.content}>

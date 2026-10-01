@@ -8,6 +8,7 @@ import { ThemedSeparator } from "@/components/themed-separator";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/hooks/use-auth";
+import { useTheme } from "@/hooks/use-theme";
 import { Link } from "expo-router";
 import { Formik } from "formik";
 import { Pressable, StyleSheet } from "react-native";
@@ -15,6 +16,7 @@ import { LoginSchema } from "../../../schemas/auth.schema";
 
 export function LoginScreen() {
   const { login, loading, signInWithSocial } = useAuth();
+  const theme = useTheme();
 
   return (
     <ThemedView safe style={styles.container}>
@@ -68,7 +70,7 @@ export function LoginScreen() {
               <Link
                 href="/forgot-password"
                 style={{
-                  color: "#0005F2",
+                  color: theme.link,
                   textDecorationLine: "underline",
                   fontSize: 12,
                 }}
@@ -91,10 +93,10 @@ export function LoginScreen() {
 
       <Spacer height={24} />
       <ThemedView style={styles.or}>
-        <ThemedSeparator thickness={0.5} color="#00000080" width="25%" />
+        <ThemedSeparator thickness={0.5} color={theme.hairline} width="25%" />
         <ThemedText
           style={{
-            color: "#333333",
+            color: theme.textSecondary,
             fontSize: 12,
             lineHeight: 22,
             fontWeight: "500",
@@ -102,7 +104,7 @@ export function LoginScreen() {
         >
           Or continue with
         </ThemedText>
-        <ThemedSeparator thickness={0.5} color="#00000080" width="25%" />
+        <ThemedSeparator thickness={0.5} color={theme.hairline} width="25%" />
       </ThemedView>
       <Spacer height={16} />
       <ThemedView style={styles.socialButtonsContainer}>
@@ -143,7 +145,7 @@ export function LoginScreen() {
             { paddingHorizontal: 18.5, paddingVertical: 14 },
           ]}
         >
-          <AppleIcon />
+          <AppleIcon color={theme.text} />
         </Pressable>
       </ThemedView>
       <Spacer height={24} />
@@ -151,7 +153,7 @@ export function LoginScreen() {
         style={{ textAlign: "center", fontSize: 12, fontWeight: 500 }}
       >
         Already have an account?{" "}
-        <Link href="/register" style={{ color: "#0005F2" }}>
+        <Link href="/register" style={{ color: theme.link }}>
           Sign Up
         </Link>
       </ThemedText>

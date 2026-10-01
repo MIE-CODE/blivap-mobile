@@ -30,7 +30,7 @@ function RadioOption({
           styles.radio,
           selected
             ? { borderColor: theme.primary, backgroundColor: theme.primary }
-            : { borderColor: "#D1D5DB" },
+            : { borderColor: theme.hairline },
         ]}
       >
         {selected ? <ThemedView style={styles.radioInner} /> : null}

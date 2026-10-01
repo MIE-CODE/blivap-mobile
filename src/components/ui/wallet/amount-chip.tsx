@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { formatNaira } from "@/utils/currency";
 import { Pressable, StyleSheet } from "react-native";
@@ -28,12 +28,12 @@ export const AmountChip = ({
         styles.chip,
         isOutline
           ? {
-              backgroundColor: "#ffffff",
-              borderColor: selected ? theme.primary : Colors.gray[5],
+              backgroundColor: theme.card,
+              borderColor: selected ? theme.primary : theme.hairline,
             }
           : selected
             ? { backgroundColor: theme.primary, borderColor: theme.primary }
-            : { backgroundColor: "#ffffff", borderColor: theme.border },
+            : { backgroundColor: theme.card, borderColor: theme.hairline },
       ]}
     >
       <ThemedText

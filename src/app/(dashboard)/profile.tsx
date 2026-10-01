@@ -8,7 +8,7 @@ import { ProfileSettingsItem } from "@/components/ui/profile/profile-settings-it
 import { ProfileStatCard } from "@/components/ui/profile/profile-stat-card";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { router } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet } from "react-native";
 import { ApiError } from "../../../services/fetcher";
@@ -136,14 +136,19 @@ export default function Profile() {
           >
             ACCOUNT SETTINGS
           </ThemedText>
-          <ThemedView style={[styles.settingsCard, { shadowColor: theme.text }]}>
+          <ThemedView
+            style={[
+              styles.settingsCard,
+              { backgroundColor: theme.card, shadowColor: theme.shadow },
+            ]}
+          >
             {SETTINGS_ITEMS.map((item, index) => (
               <ProfileSettingsItem
                 key={item.label}
                 label={item.label}
                 icon={item.icon}
                 showDivider={index < SETTINGS_ITEMS.length - 1}
-                onPress={() => router.push(item.href)}
+                onPress={() => openRoute(item.href)}
               />
             ))}
           </ThemedView>
@@ -152,7 +157,7 @@ export default function Profile() {
         <Button
           variant="outline"
           size="large"
-          onPress={() => router.push("/settings/logout")}
+          onPress={() => openRoute("/settings/logout")}
           style={{
             borderColor: theme.primary,
             backgroundColor: "transparent",

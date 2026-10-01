@@ -9,7 +9,7 @@ import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { formatNaira, parseAmountInput } from "@/utils/currency";
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { useState } from "react";
 import { ScrollView, StyleSheet, TextInput } from "react-native";
 
@@ -33,11 +33,11 @@ export default function AddMoney() {
     const params = { amount: String(amount) };
 
     if (paymentMethod === "card") {
-      router.push({ pathname: "/card-payment", params });
+      openRoute({ pathname: "/card-payment", params });
       return;
     }
 
-    router.push({ pathname: "/bank-transfer", params });
+    openRoute({ pathname: "/bank-transfer", params });
   };
 
   return (
@@ -52,7 +52,12 @@ export default function AddMoney() {
           amount={WALLET_BALANCE}
         />
 
-        <ThemedView style={[styles.amountCard, { shadowColor: theme.text }]}>
+        <ThemedView
+          style={[
+            styles.amountCard,
+            { backgroundColor: theme.card, shadowColor: theme.shadow },
+          ]}
+        >
           <ThemedText
             type="xSmall"
             style={{ color: theme.textSecondary }}

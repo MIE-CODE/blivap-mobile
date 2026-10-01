@@ -71,12 +71,12 @@ export const BloodDonorTab = () => {
             style={[
               styles.card,
               {
-                shadowColor: theme.text,
-                backgroundColor: theme.background,
+                shadowColor: theme.shadow,
+                backgroundColor: theme.card,
               },
             ]}
           >
-            <ThemedView style={styles.droplet}>
+            <ThemedView style={[styles.droplet, { backgroundColor: theme.muted }]}>
               <BloodIcon width={18} height={18} />
             </ThemedView>
             <ThemedView style={styles.identity}>
@@ -90,7 +90,7 @@ export const BloodDonorTab = () => {
                     {
                       backgroundColor: donor.isActiveDonor
                         ? "#E8F8EC"
-                        : "#F3F4F6",
+                        : theme.muted,
                     },
                   ]}
                 >
@@ -137,7 +137,9 @@ export const BloodDonorTab = () => {
       >
         <ThemedText>Available Donors</ThemedText>
         <ThemedText type="smallBold" style={{ color: theme.primary }}>
-          <Link href="/donors">View All</Link>
+          <Link href="/donors" dangerouslySingular>
+            View All
+          </Link>
         </ThemedText>
       </ThemedView>
       <Spacer height={8} />

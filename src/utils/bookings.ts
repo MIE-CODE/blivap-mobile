@@ -8,11 +8,43 @@ export type AppBooking = {
   donorUserId: string;
   requesterName: string;
   requesterAvatar: string;
+  donorName: string;
+  donorAvatar: string;
   hospitalName: string;
   bloodType: string;
   description: string;
+  meetingCode?: string;
   welfare?: WelfareView;
 };
+
+export function bookingStatusLabel(status: string): string {
+  switch (status) {
+    case "accepted":
+      return "Accepted";
+    case "rejected":
+      return "Declined";
+    case "pending":
+      return "Pending";
+    case "cancelled":
+      return "Cancelled";
+    case "expired":
+      return "Expired";
+    case "completed":
+      return "Completed";
+    case "no_show":
+      return "No show";
+    case "awaiting_welfare_funding":
+      return "Awaiting welfare";
+    default:
+      return status.replace(/_/g, " ");
+  }
+}
+
+export function normalizeBookingStatus(status: string): string {
+  const lower = status.trim().toLowerCase();
+  if (lower === "declined") return "rejected";
+  return lower;
+}
 
 function personFrom(ref: unknown): { name: string; image: string; bloodType: string } {
   const record = asRecord(ref);
@@ -46,7 +78,8 @@ export function parseBookings(
     if (!record || record.isDeleted === true) return [];
     const id = pickString(record.id) ?? pickString(record._id);
     const scheduledAt = pickString(record.scheduledAt);
-    const status = pickString(record.status);
+    const rawStatus = pickString(record.status);
+    const status = rawStatus ? normalizeBookingStatus(rawStatus) : "";
     const donorUserId = refId(record.donorUserId);
     if (!id || !scheduledAt || !status || !donorUserId) return [];
     if (status === "awaiting_welfare_funding" && options?.hideUnfunded) {
@@ -70,9 +103,12 @@ export function parseBookings(
         donorUserId,
         requesterName: requester.name || "Requester",
         requesterAvatar: requester.image,
+        donorName: donor.name || "Donor",
+        donorAvatar: donor.image,
         hospitalName: hospitalName || "Hospital",
-        bloodType: donor.bloodType || "—",
+        bloodType: donor.bloodType || requester.bloodType || "—",
         description: `Donation scheduled for ${new Date(scheduledAt).toLocaleString()}`,
+        meetingCode: sixDigitCode(record.meetingCode ?? record.meeting_code),
         welfare: parseWelfare(record.welfare) ?? undefined,
       },
     ];
@@ -83,6 +119,35 @@ export function parseBooking(body: unknown): AppBooking | null {
   const root = asRecord(body);
   const data = root?.data ?? body;
   return parseBookings({ data: [data] })[0] ?? null;
+}
+
+/** Status and meeting code returned by accept or decline. */
+export function parseBookingPatch(body: unknown): Partial<AppBooking> | null {
+  const parsed = parseBooking(body);
+  if (parsed) {
+    return {
+      status: parsed.status,
+      ...(parsed.meetingCode ? { meetingCode: parsed.meetingCode } : {}),
+    };
+  }
+
+  const root = asRecord(body);
+  const data = asRecord(root?.data) ?? root;
+  if (!data) return null;
+  const statusRaw = pickString(data.status);
+  const meetingCode = sixDigitCode(data.meetingCode ?? data.meeting_code);
+  const patch: Partial<AppBooking> = {};
+  if (statusRaw) patch.status = normalizeBookingStatus(statusRaw);
+  if (meetingCode) patch.meetingCode = meetingCode;
+  return Object.keys(patch).length ? patch : null;
+}
+
+function sixDigitCode(value: unknown): string | undefined {
+  const raw = pickString(value);
+  if (!raw) return undefined;
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 6) return digits;
+  return raw;
 }
 
 export function formatWhen(iso: string): string {

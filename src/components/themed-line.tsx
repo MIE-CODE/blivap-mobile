@@ -1,3 +1,4 @@
+import { useTheme } from "@/hooks/use-theme";
 import { StyleProp, ViewStyle } from "react-native";
 import { ThemedView } from "./themed-view";
 interface LineProps {
@@ -6,11 +7,17 @@ interface LineProps {
   style?: StyleProp<ViewStyle>;
 }
 export const Line = ({
-  strokeColor = "#000000",
+  strokeColor,
   strokeWidth = 1,
   style,
-}: LineProps) => (
-  <ThemedView
-    style={[style, { height: strokeWidth, backgroundColor: strokeColor }]}
-  />
-);
+}: LineProps) => {
+  const theme = useTheme();
+  return (
+    <ThemedView
+      style={[
+        style,
+        { height: strokeWidth, backgroundColor: strokeColor ?? theme.hairline },
+      ]}
+    />
+  );
+};

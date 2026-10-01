@@ -12,7 +12,7 @@ export function ConfidentialityNote() {
       style={[
         styles.container,
         {
-          backgroundColor: "#FFF1F1",
+          backgroundColor: theme.tint,
           borderLeftColor: theme.primary,
         },
       ]}

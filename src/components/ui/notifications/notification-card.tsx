@@ -1,11 +1,13 @@
 import { Skeleton } from "@/components/themed-skeleton";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { copyToClipboard } from "@/utils/clipboard";
 import { Feather } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
 
 export type NotificationIconType =
   | "success"
@@ -29,6 +31,7 @@ type NotificationCardProps = {
   timestamp: string;
   unread?: boolean;
   iconType: NotificationIconType;
+  code?: string;
   onPress?: () => void;
 };
 
@@ -41,6 +44,23 @@ function readableBody(body: string) {
     .replace(/\\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+const LABELED_CODE = /(?:meetup\s+code|meeting\s+code|code)\s*:\s*([A-Za-z0-9-]{4,12})/i;
+
+function notificationCode(message: string, explicit?: string) {
+  const labeled = message.match(LABELED_CODE)?.[1];
+  const code = (explicit || labeled || "").trim();
+  if (!code) return null;
+
+  const at = message.indexOf(code);
+  if (at < 0) return { before: message, code, after: "" };
+
+  return {
+    before: message.slice(0, at).replace(/[:\s]+$/, ""),
+    code,
+    after: message.slice(at + code.length).replace(/^[\s.:]+/, ""),
+  };
 }
 
 const ICON_CONFIG: Record<
@@ -79,15 +99,37 @@ export const NotificationCard = ({
   timestamp,
   unread = false,
   iconType,
+  code: explicitCode,
   onPress,
 }: NotificationCardProps) => {
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
   const message = readableBody(body);
-  const canExpand = message.length > PREVIEW_LENGTH || message.includes("\n");
+  const parsed = notificationCode(message, explicitCode);
+  const canExpand = parsed
+    ? parsed.after.length > 0 || parsed.before.length > PREVIEW_LENGTH
+    : message.length > PREVIEW_LENGTH || message.includes("\n");
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 1600);
+    return () => clearTimeout(timer);
+  }, [copied]);
 
   const handlePress = () => {
     setExpanded((open) => !open);
+    onPress?.();
+  };
+
+  const copyCode = async () => {
+    if (!parsed) return;
+    const didCopy = await copyToClipboard(parsed.code);
+    setCopied(true);
+    Toast.show({
+      type: "success",
+      text1: didCopy ? "Code copied" : "Code ready to share",
+    });
     onPress?.();
   };
 
@@ -97,9 +139,9 @@ export const NotificationCard = ({
         style={[
           styles.card,
           {
-            backgroundColor: "#ffffff",
-            shadowColor: theme.text,
-            borderColor: unread ? theme.primary : Colors.gray[5],
+            backgroundColor: theme.card,
+            shadowColor: theme.shadow,
+            borderColor: unread ? theme.primary : theme.hairline,
             borderWidth: 1,
           },
         ]}
@@ -117,13 +159,59 @@ export const NotificationCard = ({
               {timestamp}
             </ThemedText>
           </ThemedView>
-          <ThemedText
-            numberOfLines={expanded ? undefined : 2}
-            ellipsizeMode="tail"
-            style={[styles.body, { color: theme.textSecondary }]}
-          >
-            {message}
-          </ThemedText>
+          {parsed ? (
+            <>
+              {parsed.before ? (
+                <ThemedText
+                  numberOfLines={expanded ? undefined : 2}
+                  style={[styles.body, { color: theme.textSecondary }]}
+                >
+                  {parsed.before}
+                </ThemedText>
+              ) : null}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Copy code"
+                onPress={() => void copyCode()}
+                style={[
+                  styles.codeChip,
+                  {
+                    backgroundColor: theme.tint,
+                    borderColor: theme.primary,
+                  },
+                ]}
+              >
+                <ThemedText
+                  numberOfLines={1}
+                  style={[styles.codeValue, { color: theme.primary }]}
+                >
+                  {parsed.code}
+                </ThemedText>
+                <ThemedView
+                  style={[styles.copyButton, { backgroundColor: theme.card }]}
+                >
+                  <Feather
+                    name={copied ? "check" : "copy"}
+                    size={14}
+                    color={theme.primary}
+                  />
+                </ThemedView>
+              </Pressable>
+              {expanded && parsed.after ? (
+                <ThemedText style={[styles.body, { color: theme.textSecondary }]}>
+                  {parsed.after}
+                </ThemedText>
+              ) : null}
+            </>
+          ) : (
+            <ThemedText
+              numberOfLines={expanded ? undefined : 2}
+              ellipsizeMode="tail"
+              style={[styles.body, { color: theme.textSecondary }]}
+            >
+              {message}
+            </ThemedText>
+          )}
           {canExpand ? (
             <ThemedText style={[styles.more, { color: theme.primary }]}>
               {expanded ? "Show less" : "Show more"}
@@ -141,13 +229,14 @@ export const NotificationCard = ({
 };
 
 export function NotificationCardSkeleton() {
+  const theme = useTheme();
   return (
     <ThemedView
       style={[
         styles.card,
         {
-          backgroundColor: "#ffffff",
-          borderColor: Colors.gray[5],
+          backgroundColor: theme.card,
+          borderColor: theme.hairline,
           borderWidth: 1,
         },
       ]}
@@ -218,6 +307,32 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.inter.semiBold,
     fontSize: 12,
     lineHeight: 16,
+  },
+  codeChip: {
+    marginTop: 6,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingLeft: 14,
+    paddingRight: 8,
+    paddingVertical: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  codeValue: {
+    flex: 1,
+    fontFamily: Fonts.inter.bold,
+    fontSize: 20,
+    letterSpacing: 4,
+    lineHeight: 26,
+  },
+  copyButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
   },
   unreadDot: {
     width: 8,

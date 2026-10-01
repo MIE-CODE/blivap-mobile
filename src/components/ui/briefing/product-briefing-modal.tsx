@@ -19,8 +19,6 @@ import {
   type CarouselRef,
 } from "react-native-reanimated-carousel";
 
-const BRIEFING_CARD_COLOR = "#FFF9F8";
-
 type BriefingSlide = {
   title: string;
   images: readonly [string, string];
@@ -121,7 +119,7 @@ export function ProductBriefingModal({
         />
 
         <View
-          style={[styles.card, { width: cardWidth, backgroundColor: BRIEFING_CARD_COLOR }]}
+          style={[styles.card, { width: cardWidth, backgroundColor: theme.card }]}
         >
           <Carousel
             ref={carouselRef}
@@ -132,7 +130,9 @@ export function ProductBriefingModal({
             onSnapToItem={handleSnap}
             renderItem={({ item }) => (
               <View style={styles.slide}>
-                <ThemedText style={styles.title}>{item.title}</ThemedText>
+                <ThemedText style={[styles.title, { color: theme.text }]}>
+                  {item.title}
+                </ThemedText>
 
                 <View style={styles.imageRow}>
                   {item.images.map((uri) => (
@@ -145,7 +145,9 @@ export function ProductBriefingModal({
                   ))}
                 </View>
 
-                <ThemedText style={styles.body}>{item.body}</ThemedText>
+                <ThemedText style={[styles.body, { color: theme.textSecondary }]}>
+                  {item.body}
+                </ThemedText>
               </View>
             )}
           />

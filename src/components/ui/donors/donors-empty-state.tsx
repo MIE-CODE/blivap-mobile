@@ -18,7 +18,7 @@ export function DonorsEmptyState({
 
   return (
     <ThemedView style={[styles.card, { borderColor: theme.border }]}>
-      <ThemedView style={[styles.iconWrap, { backgroundColor: "#F8E8EA" }]}>
+      <ThemedView style={[styles.iconWrap, { backgroundColor: theme.tint }]}>
         <BloodIcon width={22} height={22} />
       </ThemedView>
       <ThemedText style={styles.title}>{title}</ThemedText>

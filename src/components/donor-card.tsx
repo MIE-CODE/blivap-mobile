@@ -23,7 +23,7 @@ export const DonorCard = ({ data, skeleton }: Card) => {
     <ThemedView
       style={[
         styles.card,
-        { shadowColor: theme.text, backgroundColor: theme.background },
+        { shadowColor: theme.shadow, backgroundColor: theme.card },
       ]}
     >
       <ThemedView
@@ -71,7 +71,7 @@ export const DonorCard = ({ data, skeleton }: Card) => {
       <ThemedView
         style={[
           styles.card,
-          { shadowColor: theme.text, backgroundColor: theme.background },
+          { shadowColor: theme.shadow, backgroundColor: theme.card },
         ]}
       >
       <ThemedView
@@ -95,7 +95,7 @@ export const DonorCard = ({ data, skeleton }: Card) => {
             paddingHorizontal: 8,
             paddingVertical: 2,
             borderRadius: 999,
-            backgroundColor: "#FFE2E2",
+            backgroundColor: theme.tint,
           }}
         >
           <ThemedText type="xSmall" style={{ color: theme.primary }}>
@@ -150,7 +150,7 @@ export const DonorCard = ({ data, skeleton }: Card) => {
             styles.reimbursement,
             {
               backgroundColor:
-                data?.expenseCoverage === "requested" ? "#F8E8EA" : "#F3F4F6",
+                data?.expenseCoverage === "requested" ? theme.tint : theme.muted,
             },
           ]}
         >

@@ -7,6 +7,7 @@ import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { Formik } from "formik";
 import { StyleSheet } from "react-native";
 import { resetTokenSchema } from "../../../../schemas/auth.schema";
@@ -35,7 +36,7 @@ export default function passwordResetCode() {
         initialValues={{ token: "" }}
         validationSchema={resetTokenSchema}
         onSubmit={(values) =>
-          router.push({
+          openRoute({
             pathname: "/set-new-password",
             params: { token: values.token.trim() },
           })

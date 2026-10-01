@@ -19,8 +19,18 @@ export const OverviewTab = () => {
           width: "100%",
         }}
       >
-        <ThemedView style={[styles.wContainer, { shadowColor: theme.text }]}>
-          <ThemedView style={[styles.wIcon, { borderColor: theme.primary }]}>
+        <ThemedView
+          style={[
+            styles.wContainer,
+            { backgroundColor: theme.card, shadowColor: theme.shadow },
+          ]}
+        >
+          <ThemedView
+            style={[
+              styles.wIcon,
+              { borderColor: theme.primary, backgroundColor: theme.tint },
+            ]}
+          >
             <Droplets />
           </ThemedView>
           <ThemedView>
@@ -76,7 +86,9 @@ export const OverviewTab = () => {
       >
         <ThemedText>Donation History</ThemedText>
         <ThemedText type="smallBold" style={{ color: theme.primary }}>
-          <Link href="/donors">View All</Link>
+          <Link href="/donors" dangerouslySingular>
+            View All
+          </Link>
         </ThemedText>
       </ThemedView>
       <Spacer height={6} />

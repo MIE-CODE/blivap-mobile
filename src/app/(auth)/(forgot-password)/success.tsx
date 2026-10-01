@@ -3,10 +3,9 @@ import { Button } from "@/components/button";
 import { Spacer } from "@/components/spacer";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useRouter } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { StyleSheet } from "react-native";
 export default function success() {
-  const router = useRouter();
   return (
     <ThemedView safe style={{ flex: 1, justifyContent: "center" }}>
       <ThemedView style={{ alignItems: "center" }}>
@@ -23,7 +22,7 @@ export default function success() {
       <Spacer height={36} />
       <Button
         size="large"
-        onPress={() => router.push("/login")}
+        onPress={() => openRoute("/login")}
         style={{ borderRadius: 10 }}
       >
         continue

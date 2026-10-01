@@ -1,4 +1,5 @@
 import { getPostAuthRoute } from "@/utils/auth-routes";
+import { openRoute } from "@/utils/open-route";
 import { toE164Phone } from "@/utils/phone";
 import { useRouter } from "expo-router";
 
@@ -63,7 +64,7 @@ export const useAuth = () => {
         type: "success",
         text1: "Identity verified",
       });
-      router.push("/donate-blood/medical-questions");
+      openRoute("/donate-blood/medical-questions");
     } catch (e) {
       Toast.show({
         type: "error",

@@ -1,4 +1,5 @@
-import { Href, router } from "expo-router";
+import { Href } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import * as Device from "expo-device";
 import { PermissionsAndroid, Platform } from "react-native";
 import { PushNotificationData } from "../types/push-notification";
@@ -406,7 +407,7 @@ function navigateFromData(data: PushNotificationData) {
   try {
     const href = getRouteForPushEvent(data.event, data);
     pushLog("info", "navigate", { event: data.event, href, data });
-    router.push(href as Href);
+    openRoute(href as Href);
   } catch (error) {
     pushLogError("navigate.failed", error, { data });
   }

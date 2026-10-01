@@ -80,7 +80,7 @@ export function DonateOptionCard({
                 borderColor: selected ? "#FFFFFF" : "transparent",
               }
             : {
-                backgroundColor: theme.background === "#F9FAFB" ? "#FFFFFF" : theme.background,
+                backgroundColor: theme.card,
                 borderWidth: selected ? 2 : 1,
                 borderColor: selected ? accentColor : accentColor,
                 shadowColor: theme.text,

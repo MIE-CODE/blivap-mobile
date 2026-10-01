@@ -54,7 +54,7 @@ export default function HelpSupport() {
               {index < FAQ_ITEMS.length - 1 ? (
                 <Line
                   strokeWidth={1}
-                  strokeColor="#E5E7EB"
+                  strokeColor={theme.hairline}
                   style={styles.divider}
                 />
               ) : null}
@@ -75,7 +75,7 @@ export default function HelpSupport() {
               icon="mail"
             />
           </Pressable>
-          <Line strokeWidth={1} strokeColor="#E5E7EB" style={styles.divider} />
+          <Line strokeWidth={1} strokeColor={theme.hairline} style={styles.divider} />
           <Pressable onPress={() => Linking.openURL("tel:18005552566")}>
             <ContactRow
               title="Phone Support"

@@ -9,7 +9,7 @@ import { WalletWidget } from "@/components/wallet-widget";
 import { Fonts } from "@/constants/theme";
 import { useProductBriefing } from "@/hooks/use-product-briefing";
 import { useTheme } from "@/hooks/use-theme";
-import { router } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { Image, Pressable, ScrollView } from "react-native";
 import { useAppSelector } from "../../../../stores/hooks";
 export default function Home() {
@@ -34,7 +34,7 @@ export default function Home() {
         <ThemedView
           style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
         >
-          <Pressable onPress={() => router.push("/profile")}>
+          <Pressable onPress={() => openRoute("/profile")}>
             <Image
               source={{ uri: user?.profileImage ?? "" }}
               style={{
@@ -63,7 +63,7 @@ export default function Home() {
             padding: 4,
             borderColor: theme.primary,
           }}
-          onPress={() => router.push("/notification")}
+          onPress={() => openRoute("/notification")}
         >
           <NotificationsIcon color={theme.text} />
         </Pressable>

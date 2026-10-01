@@ -7,7 +7,8 @@ import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { formatNaira } from "@/utils/currency";
 import { Feather } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { useState } from "react";
 import {
   Pressable,
@@ -49,14 +50,14 @@ export default function CardPayment() {
       cardholder.trim().length > 0;
 
     if (!isValid) {
-      router.push({
+      openRoute({
         pathname: "/add-money-failed",
         params: { amount: String(amount), method: "card" },
       });
       return;
     }
 
-    router.push({
+    openRoute({
       pathname: "/add-money-success",
       params: { amount: String(amount), method: "card" },
     });
@@ -71,7 +72,12 @@ export default function CardPayment() {
       >
         <WalletAmountCard label="Amount to Add" amount={amount} />
 
-        <ThemedView style={[styles.formCard, { shadowColor: theme.text }]}>
+        <ThemedView
+          style={[
+            styles.formCard,
+            { backgroundColor: theme.card, shadowColor: theme.shadow },
+          ]}
+        >
           <ThemedText style={styles.fieldLabel}>Card Number</ThemedText>
           <View
             style={[styles.inputWrap, { borderColor: theme.backgroundElement }]}

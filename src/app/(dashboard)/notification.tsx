@@ -1,6 +1,6 @@
 import { Header } from "@/components/header";
-import { Skeleton } from "@/components/themed-skeleton";
 import { Spacer } from "@/components/spacer";
+import { Skeleton } from "@/components/themed-skeleton";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import {
@@ -34,7 +34,10 @@ function iconFor(type: string, title: string): NotificationIconType {
   ) {
     return "referral";
   }
-  if (type.includes("verification_approved") || type.includes("donor_approved")) {
+  if (
+    type.includes("verification_approved") ||
+    type.includes("donor_approved")
+  ) {
     return "reward";
   }
   if (type.includes("donor_matched")) return "matched";
@@ -49,9 +52,15 @@ function iconFor(type: string, title: string): NotificationIconType {
     return "warning";
   }
   if (type.includes("meetup")) return "meetup";
-  if (type.includes("booking") || type.includes("appointment")) return "calendar";
+  if (type.includes("booking") || type.includes("appointment"))
+    return "calendar";
   if (type.includes("broadcast")) return "announcement";
   return "announcement";
+}
+
+function meetupCode(item: InAppNotification) {
+  const raw = item.data?.myMeetupCode ?? item.data?.meetingCode;
+  return typeof raw === "string" ? raw.trim() : undefined;
 }
 
 function formatTimestamp(iso: string) {
@@ -153,8 +162,8 @@ export default function Notification() {
       {loading ? (
         <ThemedView style={styles.sectionItems}>
           <Skeleton width={72} height={12} />
-          {[0, 1, 2, 3].map((item) => (
-            <NotificationCardSkeleton key={item} />
+          {[...Array(10)].map((_, i) => (
+            <NotificationCardSkeleton key={i} />
           ))}
         </ThemedView>
       ) : (
@@ -200,6 +209,7 @@ export default function Notification() {
                       timestamp={formatTimestamp(item.createdAt)}
                       unread={!item.readAt}
                       iconType={iconFor(item.type, item.title)}
+                      code={meetupCode(item)}
                       onPress={() => {
                         if (!item.readAt) void markRead(item.id);
                       }}

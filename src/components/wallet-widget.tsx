@@ -8,7 +8,7 @@ import { Colors } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { Feather, Octicons } from "@expo/vector-icons";
 import { formatKobo, parseWelfareWallet } from "@/utils/welfare";
-import { router } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { $api } from "../../services/api-client";
@@ -96,7 +96,7 @@ export const WalletWidget = () => {
           size="small"
           style={{ borderColor: "#FFFFFF33" }}
           icon={<WithdrawIcon width={16} height={16} color={theme.text} />}
-          onPress={() => router.push("/withdraw")}
+          onPress={() => openRoute("/withdraw")}
         >
           <ThemedText style={{ color: "white", fontSize: 12, fontWeight: 400 }}>
             Withdraw
@@ -107,7 +107,7 @@ export const WalletWidget = () => {
           size="small"
           style={{ borderColor: "#FFFFFF33" }}
           icon={<PlusIcon width={16} height={16} />}
-          onPress={() => router.push("/add-money")}
+          onPress={() => openRoute("/add-money")}
         >
           <ThemedText style={{ color: "white", fontSize: 12, fontWeight: 400 }}>
             Add Money

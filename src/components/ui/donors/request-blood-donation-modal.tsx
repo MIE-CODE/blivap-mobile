@@ -252,7 +252,7 @@ export const RequestBloodDonationModal = ({
     onClose();
   };
 
-  const fieldBorder = (open: boolean) => (open ? theme.primary : Colors.gray[5]);
+  const fieldBorder = (open: boolean) => (open ? theme.primary : theme.hairline);
 
   const openUrgency = () => {
     setUnitsOpen(false);
@@ -288,7 +288,7 @@ export const RequestBloodDonationModal = ({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <Pressable style={styles.backdrop} onPress={handleClose} />
-        <View style={[styles.card, { backgroundColor: theme.background }]}>
+        <View style={[styles.card, { backgroundColor: theme.card }]}>
           <ScrollView
             style={{ maxHeight: windowHeight * 0.78 }}
             keyboardShouldPersistTaps="handled"
@@ -305,7 +305,7 @@ export const RequestBloodDonationModal = ({
 
             <Line
               strokeWidth={1}
-              strokeColor={Colors.gray[5]}
+              strokeColor={theme.hairline}
               style={{ marginVertical: 16 }}
             />
 
@@ -322,7 +322,7 @@ export const RequestBloodDonationModal = ({
                   style={{
                     marginTop: 16,
                     borderRadius: 10,
-                    backgroundColor: Colors.gray[5],
+                    backgroundColor: theme.muted,
                   }}
                   textStyle={{ color: theme.text, fontSize: 14 }}
                 >
@@ -421,7 +421,7 @@ export const RequestBloodDonationModal = ({
               ) : null}
             </View>
             {hospitalOpen && !hospitalId ? (
-              <View style={styles.menu}>
+              <View style={[styles.menu, { borderColor: theme.hairline, backgroundColor: theme.card }]}>
                 {searching && hospitals.length === 0 ? (
                   <ThemedText style={[styles.empty, { color: theme.textSecondary }]}>
                     Searching hospitals...
@@ -451,10 +451,13 @@ export const RequestBloodDonationModal = ({
                           }}
                           style={[
                             styles.hospitalRow,
-                            index < hospitals.length - 1 && styles.hospitalDivider,
+                            index < hospitals.length - 1 && [
+                              styles.hospitalDivider,
+                              { borderBottomColor: theme.hairline },
+                            ],
                           ]}
                         >
-                          <View style={[styles.hospitalMark, { backgroundColor: "#F8E8EA" }]}>
+                          <View style={[styles.hospitalMark, { backgroundColor: theme.tint }]}>
                             <Ionicons name="business-outline" size={16} color={theme.primary} />
                           </View>
                           <View style={styles.hospitalCopy}>
@@ -482,7 +485,7 @@ export const RequestBloodDonationModal = ({
               <Button
                 variant="soft"
                 onPress={handleClose}
-                style={{ ...styles.actionButton, backgroundColor: Colors.gray[5] }}
+                style={{ ...styles.actionButton, backgroundColor: theme.muted }}
                 textStyle={{ color: theme.text, fontSize: 14 }}
               >
                 Cancel
@@ -517,7 +520,8 @@ export const RequestBloodDonationModal = ({
                 top: urgencyFrame.y + urgencyFrame.height + 6,
                 left: urgencyFrame.x,
                 width: urgencyFrame.width,
-                backgroundColor: theme.background,
+                backgroundColor: theme.card,
+                borderColor: theme.hairline,
               },
             ]}
           >
@@ -562,7 +566,8 @@ export const RequestBloodDonationModal = ({
                 top: unitsFrame.y + unitsFrame.height + 6,
                 left: unitsFrame.x,
                 width: unitsFrame.width,
-                backgroundColor: theme.background,
+                backgroundColor: theme.card,
+                borderColor: theme.hairline,
               },
             ]}
           >

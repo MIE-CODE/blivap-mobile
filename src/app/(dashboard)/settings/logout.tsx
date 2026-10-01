@@ -17,7 +17,7 @@ export default function LogoutScreen() {
     <ThemedView safe style={styles.container}>
       <Header title="Log Out" titleStyle={{ color: theme.primary }} />
       <ThemedView style={styles.content}>
-        <ThemedView style={[styles.iconOuter, { backgroundColor: "#FFE2E2" }]}>
+        <ThemedView style={[styles.iconOuter, { backgroundColor: theme.tint }]}>
           <ThemedView style={[styles.iconInner, { backgroundColor: theme.primary }]}>
             <Feather name="log-out" size={28} color="#ffffff" />
           </ThemedView>
@@ -37,7 +37,7 @@ export default function LogoutScreen() {
           variant="outline"
           size="large"
           onPress={() => router.back()}
-          style={{ borderColor: theme.primary, backgroundColor: "#ffffff" }}
+          style={{ borderColor: theme.primary, backgroundColor: theme.card }}
           textStyle={{ color: theme.primary, fontFamily: Fonts.inter.bold }}
         >
           Cancel

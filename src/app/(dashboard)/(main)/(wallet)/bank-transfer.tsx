@@ -9,7 +9,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { formatNaira } from "@/utils/currency";
 import { Feather } from "@expo/vector-icons";
 import { copyToClipboard } from "@/utils/clipboard";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
@@ -47,7 +48,7 @@ export default function BankTransfer() {
   };
 
   const handleConfirm = () => {
-    router.push({
+    openRoute({
       pathname: "/add-money-success",
       params: { amount: String(amount), method: "bank" },
     });
@@ -62,7 +63,12 @@ export default function BankTransfer() {
       >
         <WalletAmountCard label="Amount to Add" amount={amount} />
 
-        <ThemedView style={[styles.detailsCard, { shadowColor: theme.text }]}>
+        <ThemedView
+          style={[
+            styles.detailsCard,
+            { backgroundColor: theme.card, shadowColor: theme.shadow },
+          ]}
+        >
           <ThemedView style={styles.timerBanner}>
             <Feather name="clock" size={16} color={theme.primary} />
             <ThemedText style={[styles.timerText, { color: theme.primary }]}>

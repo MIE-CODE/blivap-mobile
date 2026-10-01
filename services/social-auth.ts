@@ -1,20 +1,36 @@
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 
+import type { AuthCredential } from "@react-native-firebase/auth";
+
 export type SocialProvider = "google" | "apple" | "facebook";
 
 type ExpoExtra = {
   googleWebClientId?: string | null;
   facebookAppId?: string | null;
+  facebookClientToken?: string | null;
 };
+
+type AuthModule = typeof import("@react-native-firebase/auth");
 
 function extra(): ExpoExtra {
   return (Constants.expoConfig?.extra ?? {}) as ExpoExtra;
 }
 
-function firebaseAuth() {
+/** Expo can deliver a missing extra value as `{}`, which is truthy. */
+function configured(value: unknown): value is string {
+  return typeof value === "string" && value.length > 0;
+}
+
+function authModule(): AuthModule {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require("@react-native-firebase/auth").default as typeof import("@react-native-firebase/auth").default;
+  return require("@react-native-firebase/auth") as AuthModule;
+}
+
+async function blivapIdToken(credential: AuthCredential): Promise<string> {
+  const auth = authModule();
+  const signedIn = await auth.signInWithCredential(auth.getAuth(), credential);
+  return auth.getIdToken(signedIn.user);
 }
 
 function cancelled(code: string): Error {
@@ -35,48 +51,30 @@ export function isSocialCancelled(error: unknown): boolean {
 
 async function googleIdToken(): Promise<string> {
   const webClientId = extra().googleWebClientId;
-  if (!webClientId) {
+  if (!configured(webClientId)) {
     throw new Error(
-      "Google sign-in is not configured. Set GOOGLE_WEB_CLIENT_ID and rebuild the app.",
+      "Google sign-in is not configured. Set GOOGLE_WEB_CLIENT_ID and restart the app.",
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { GoogleSignin } = require("@react-native-google-signin/google-signin") as typeof import("@react-native-google-signin/google-signin");
+  const { GoogleSignin } =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("@react-native-google-signin/google-signin") as typeof import("@react-native-google-signin/google-signin");
   GoogleSignin.configure({ webClientId });
   if (Platform.OS === "android") {
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
   }
 
   const response = await GoogleSignin.signIn();
-  if (response && typeof response === "object" && "type" in response) {
+  if (response.type === "cancelled" || !response.data?.idToken) {
     if (response.type === "cancelled") {
       throw cancelled("SIGN_IN_CANCELLED");
     }
-  }
-
-  const idToken =
-    (response &&
-      typeof response === "object" &&
-      "data" in response &&
-      response.data &&
-      typeof response.data === "object" &&
-      "idToken" in response.data &&
-      response.data.idToken) ||
-    (response &&
-      typeof response === "object" &&
-      "idToken" in response &&
-      response.idToken) ||
-    null;
-
-  if (!idToken || typeof idToken !== "string") {
     throw new Error("Google did not return a sign-in token");
   }
 
-  const auth = firebaseAuth();
-  const credential = auth.GoogleAuthProvider.credential(idToken);
-  const signedIn = await auth().signInWithCredential(credential);
-  return signedIn.user.getIdToken();
+  const auth = authModule();
+  return blivapIdToken(auth.GoogleAuthProvider.credential(response.data.idToken));
 }
 
 async function appleIdToken(): Promise<string> {
@@ -84,10 +82,12 @@ async function appleIdToken(): Promise<string> {
     throw new Error("Apple sign-in is available on iPhone");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const AppleAuthentication = require("expo-apple-authentication") as typeof import("expo-apple-authentication");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const Crypto = require("expo-crypto") as typeof import("expo-crypto");
+  const AppleAuthentication =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("expo-apple-authentication") as typeof import("expo-apple-authentication");
+  const Crypto =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("expo-crypto") as typeof import("expo-crypto");
 
   const available = await AppleAuthentication.isAvailableAsync();
   if (!available) {
@@ -110,24 +110,45 @@ async function appleIdToken(): Promise<string> {
     throw new Error("Apple did not return a sign-in token");
   }
 
-  const auth = firebaseAuth();
+  const auth = authModule();
   const credential = auth.AppleAuthProvider.credential(
     apple.identityToken,
     rawNonce,
+    apple.fullName ?? undefined,
   );
-  const signedIn = await auth().signInWithCredential(credential);
-  return signedIn.user.getIdToken();
+  return blivapIdToken(credential);
 }
 
 async function facebookIdToken(): Promise<string> {
-  if (!extra().facebookAppId) {
+  const appId = extra().facebookAppId;
+  const clientToken = extra().facebookClientToken;
+  if (!configured(appId) || !configured(clientToken)) {
     throw new Error(
       "Facebook sign-in is not configured. Set FACEBOOK_APP_ID and FACEBOOK_CLIENT_TOKEN, then rebuild the app.",
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { AccessToken, LoginManager } = require("react-native-fbsdk-next") as typeof import("react-native-fbsdk-next");
+  const { NativeModules } =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("react-native") as typeof import("react-native");
+  const settings = NativeModules.FBSettings;
+  if (!settings) {
+    throw new Error(
+      "Facebook sign-in is not in this build. Set FACEBOOK_APP_ID and FACEBOOK_CLIENT_TOKEN, then rebuild the app.",
+    );
+  }
+  // The package entry loads AccessToken immediately, and that native module
+  // throws unless the SDK is already initialized.
+  await settings.setAppID(appId);
+  await settings.setClientToken(clientToken);
+  await settings.initializeSDK();
+
+  const LoginManager =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("react-native-fbsdk-next/lib/module/FBLoginManager").default as typeof import("react-native-fbsdk-next").LoginManager;
+  const AccessToken =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("react-native-fbsdk-next/lib/module/FBAccessToken").default as typeof import("react-native-fbsdk-next").AccessToken;
   const result = await LoginManager.logInWithPermissions([
     "public_profile",
     "email",
@@ -141,13 +162,15 @@ async function facebookIdToken(): Promise<string> {
     throw new Error("Facebook did not return a sign-in token");
   }
 
-  const auth = firebaseAuth();
-  const credential = auth.FacebookAuthProvider.credential(current.accessToken);
-  const signedIn = await auth().signInWithCredential(credential);
-  return signedIn.user.getIdToken();
+  const auth = authModule();
+  return blivapIdToken(
+    auth.FacebookAuthProvider.credential(current.accessToken),
+  );
 }
 
-export async function firebaseIdToken(provider: SocialProvider): Promise<string> {
+export async function firebaseIdToken(
+  provider: SocialProvider,
+): Promise<string> {
   if (provider === "google") return googleIdToken();
   if (provider === "apple") return appleIdToken();
   return facebookIdToken();

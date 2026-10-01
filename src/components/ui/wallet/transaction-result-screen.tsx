@@ -93,7 +93,12 @@ export const TransactionResultScreen = ({
           </ThemedText>
         </ThemedView>
 
-        <ThemedView style={[styles.summaryCard, { shadowColor: theme.text }]}>
+        <ThemedView
+          style={[
+            styles.summaryCard,
+            { backgroundColor: theme.card, shadowColor: theme.shadow },
+          ]}
+        >
           <ThemedText
             style={[styles.summaryTitle, { color: Colors.softPrimary }]}
           >

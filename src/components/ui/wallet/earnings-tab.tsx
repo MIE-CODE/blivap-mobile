@@ -3,7 +3,7 @@ import { Line } from "@/components/themed-line";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { EarningHistoryCard } from "@/components/ui/wallet/earning-history-card";
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { parseWelfareWallet, WelfareWalletEntry } from "@/utils/welfare";
 import { useEffect, useState } from "react";
@@ -58,7 +58,7 @@ const StatColumn = ({ label, amount, showDivider }: StatColumnProps) => {
         styles.statColumn,
         showDivider && {
           borderRightWidth: 1,
-          borderRightColor: Colors.gray[5],
+          borderRightColor: theme.hairline,
         },
       ]}
     >
@@ -103,7 +103,12 @@ export const EarningsTab = () => {
 
   return (
     <ThemedView>
-      <ThemedView style={[styles.summaryCard, { shadowColor: theme.text }]}>
+      <ThemedView
+        style={[
+          styles.summaryCard,
+          { backgroundColor: theme.card, shadowColor: theme.shadow },
+        ]}
+      >
         <ThemedText
           type="xSmallSemiBold"
           style={[styles.totalLabel, { color: theme.textSecondary }]}
@@ -115,7 +120,7 @@ export const EarningsTab = () => {
         </ThemedText>
         <Line
           strokeWidth={1}
-          strokeColor={Colors.gray[5]}
+          strokeColor={theme.hairline}
           style={{ marginVertical: 16 }}
         />
         <ThemedView style={styles.statsRow}>

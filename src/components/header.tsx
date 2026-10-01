@@ -1,5 +1,6 @@
 import { Fonts } from "@/constants/theme";
 import { router } from "expo-router";
+import { ReactNode } from "react";
 import { StyleProp, TextStyle } from "react-native";
 import { BackBtn } from "./back-btn";
 import { Spacer } from "./spacer";
@@ -9,8 +10,9 @@ export type HeaderProps = {
   title: string;
   onBack?: () => void;
   titleStyle?: StyleProp<TextStyle>;
+  right?: ReactNode;
 };
-export const Header = ({ title, onBack, titleStyle }: HeaderProps) => (
+export const Header = ({ title, onBack, titleStyle, right }: HeaderProps) => (
   <ThemedView
     style={{
       flexDirection: "row",
@@ -25,6 +27,6 @@ export const Header = ({ title, onBack, titleStyle }: HeaderProps) => (
     >
       {title}
     </ThemedText>
-    <Spacer width={40} />
+    {right ?? <Spacer width={40} />}
   </ThemedView>
 );

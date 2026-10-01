@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { Formik } from "formik";
 import { StyleSheet } from "react-native";
 import { forgotPasswordSchema } from "../../../../schemas/auth.schema";
@@ -29,7 +30,7 @@ export default function forgotPassword() {
         onSubmit={async (values) => {
           const sent = await sendResetEmail(values.email.trim());
           if (!sent) return;
-          router.push({
+          openRoute({
             pathname: "/password-reset-code",
             params: { email: values.email.trim() },
           });

@@ -33,7 +33,12 @@ export default function DeleteAccount() {
       >
         <ThemedView style={styles.section}>
           <SettingsSectionLabel title="Critical Warning" />
-          <ThemedView style={[styles.warningCard, { borderColor: theme.primary }]}>
+          <ThemedView
+            style={[
+              styles.warningCard,
+              { backgroundColor: theme.card, borderColor: theme.primary },
+            ]}
+          >
             <ThemedView style={styles.warningTitleRow}>
               <Feather name="alert-triangle" size={18} color={theme.primary} />
               <ThemedText style={[styles.warningTitle, { color: theme.primary }]}>
@@ -44,7 +49,7 @@ export default function DeleteAccount() {
               Once you delete your account, your data, profile settings, and
               payment history will be permanently erased. This cannot be undone.
             </ThemedText>
-            <Line strokeWidth={1} strokeColor="#E5E7EB" />
+            <Line strokeWidth={1} strokeColor={theme.hairline} />
             {WARNING_ITEMS.map((item) => (
               <ThemedView key={item} style={styles.warningItem}>
                 <Feather name="x" size={14} color={theme.primary} />
@@ -58,7 +63,12 @@ export default function DeleteAccount() {
 
         <ThemedView style={styles.section}>
           <SettingsSectionLabel title="Confirm Deletion" />
-          <ThemedView style={[styles.confirmCard, { borderColor: theme.border }]}>
+          <ThemedView
+            style={[
+              styles.confirmCard,
+              { backgroundColor: theme.card, borderColor: theme.hairline },
+            ]}
+          >
             <ThemedView style={styles.confirmRow}>
               <ThemedText style={styles.confirmLabel}>
                 I understand this action is permanent
@@ -66,7 +76,7 @@ export default function DeleteAccount() {
               <Switch
                 value={confirmed}
                 onValueChange={setConfirmed}
-                trackColor={{ false: "#E0E0E0", true: theme.primary }}
+                trackColor={{ false: theme.muted, true: theme.primary }}
                 thumbColor="#ffffff"
               />
             </ThemedView>

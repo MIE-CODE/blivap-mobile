@@ -1,7 +1,7 @@
 import { Line } from "@/components/themed-line";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { ReactNode, useEffect } from "react";
 import { Pressable, StyleSheet } from "react-native";
@@ -44,7 +44,7 @@ export function SettingsToggleRow({
     backgroundColor: interpolateColor(
       progress.value,
       [0, 1],
-      [Colors.gray[5], theme.primary],
+      [theme.muted, theme.primary],
     ),
   }));
 
@@ -78,7 +78,7 @@ export function SettingsToggleRow({
       {showDivider ? (
         <Line
           strokeWidth={1}
-          strokeColor={Colors.gray[5]}
+          strokeColor={theme.hairline}
           style={styles.divider}
         />
       ) : null}
@@ -94,7 +94,9 @@ export function SettingsCard({ children }: SettingsCardProps) {
   const theme = useTheme();
 
   return (
-    <ThemedView style={[styles.card, { shadowColor: theme.text }]}>
+    <ThemedView
+      style={[styles.card, { backgroundColor: theme.card, shadowColor: theme.shadow }]}
+    >
       {children}
     </ThemedView>
   );

@@ -6,7 +6,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { useRouter } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { Formik } from "formik";
 import { StyleSheet } from "react-native";
 import { otpSchema } from "../../../schemas/auth.schema";
@@ -16,8 +16,6 @@ export default function VerifyOtp() {
   const theme = useTheme();
   const { user } = useAppSelector((s) => s.auth);
   const { verifyOtp, resendVerification, loading } = useAuth();
-  const router = useRouter();
-
   return (
     <ThemedView safe style={{ flex: 1 }}>
       <Spacer height={32} />
@@ -27,7 +25,7 @@ export default function VerifyOtp() {
           justifyContent: "flex-start",
         }}
       >
-        <BackBtn onPress={() => router.push("/login")} />
+        <BackBtn onPress={() => openRoute("/login")} />
       </ThemedView>
       <Spacer height={53} />
       <ThemedView style={{ alignItems: "center", justifyContent: "center" }}>

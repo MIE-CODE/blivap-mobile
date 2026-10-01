@@ -1,3 +1,4 @@
+const { execFileSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
@@ -57,11 +58,23 @@ if (androidJson && fs.existsSync(androidJson)) {
 
 function plistString(file, key) {
   if (!file || !fs.existsSync(file)) return null;
-  const text = fs.readFileSync(file, "utf8");
-  const match = text.match(
-    new RegExp(`<key>${key}</key>\\s*<string>([^<]*)</string>`),
-  );
-  return match ? match[1] : null;
+  try {
+    return execFileSync(
+      "/usr/bin/plutil",
+      ["-extract", key, "raw", "-o", "-", file],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
+    ).trim();
+  } catch {
+    try {
+      const text = fs.readFileSync(file, "utf8");
+      const match = text.match(
+        new RegExp(`<key>${key}</key>\\s*<string>([^<]*)</string>`),
+      );
+      return match ? match[1] : null;
+    } catch {
+      return null;
+    }
+  }
 }
 
 config.ios.usesAppleSignIn = true;
@@ -117,6 +130,7 @@ config.extra = {
   ...(config.extra || {}),
   googleWebClientId: process.env.GOOGLE_WEB_CLIENT_ID || null,
   facebookAppId: facebookAppId || null,
+  facebookClientToken: facebookClientToken || null,
 };
 
 module.exports = { expo: config };

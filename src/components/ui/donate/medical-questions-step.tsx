@@ -56,7 +56,12 @@ export function MedicalQuestionsStep({
       {loading ? (
         <ActivityIndicator color={theme.primary} />
       ) : (
-        <ThemedView style={[styles.questionnaireCard, { shadowColor: theme.text }]}>
+        <ThemedView
+          style={[
+            styles.questionnaireCard,
+            { backgroundColor: theme.card, shadowColor: theme.shadow },
+          ]}
+        >
           <ThemedText style={styles.cardTitle}>
             Please complete the questions
           </ThemedText>

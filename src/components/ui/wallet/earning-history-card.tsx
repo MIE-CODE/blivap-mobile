@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { StyleSheet } from "react-native";
 
@@ -28,8 +28,8 @@ export const EarningHistoryCard = ({
       style={[
         styles.card,
         {
-          borderColor: Colors.gray[5],
-          backgroundColor: "#ffffff",
+          borderColor: theme.hairline,
+          backgroundColor: theme.card,
         },
       ]}
     >

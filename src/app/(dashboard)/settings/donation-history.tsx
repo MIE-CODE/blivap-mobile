@@ -71,7 +71,10 @@ export default function DonationHistory() {
           {bookings.map((item) => (
             <ThemedView
               key={item.id}
-              style={[styles.timelineCard, { shadowColor: theme.text }]}
+              style={[
+                styles.timelineCard,
+                { backgroundColor: theme.card, shadowColor: theme.shadow },
+              ]}
             >
               <ThemedView style={styles.timelineHeader}>
                 <ThemedText

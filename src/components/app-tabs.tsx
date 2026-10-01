@@ -14,7 +14,9 @@ export default function AppTabs() {
       tabBar={(props) => <TabBar {...props} />}
     >
       <Tabs.Screen name="home" options={{ title: "Home" }} />
+      <Tabs.Screen name="bookings" options={{ title: "Bookings" }} />
       <Tabs.Screen name="donate" options={{ title: "Donate" }} />
+      <Tabs.Screen name="chat" options={{ title: "Chat" }} />
       <Tabs.Screen name="(wallet)" options={{ title: "Wallet" }} />
       <Tabs.Screen name="(donors)/donors" options={{ href: null }} />
     </Tabs>

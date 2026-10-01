@@ -147,7 +147,7 @@ export default function Register() {
                       <Link
                         href="/register"
                         style={{
-                          color: "#0005F2",
+                          color: theme.link,
                           textDecorationLine: "underline",
                         }}
                       >
@@ -179,7 +179,7 @@ export default function Register() {
                       <Link
                         href="/register"
                         style={{
-                          color: "#0005F2",
+                          color: theme.link,
                           textDecorationLine: "underline",
                         }}
                       >
@@ -204,10 +204,10 @@ export default function Register() {
 
         <Spacer height={24} />
         <ThemedView style={styles.or}>
-          <ThemedSeparator thickness={0.5} color="#00000080" width="25%" />
+          <ThemedSeparator thickness={0.5} color={theme.hairline} width="25%" />
           <ThemedText
             style={{
-              color: "#333333",
+              color: theme.textSecondary,
               fontSize: 12,
               lineHeight: 22,
               fontWeight: "500",
@@ -215,7 +215,7 @@ export default function Register() {
           >
             Or continue with
           </ThemedText>
-          <ThemedSeparator thickness={0.5} color="#00000080" width="25%" />
+          <ThemedSeparator thickness={0.5} color={theme.hairline} width="25%" />
         </ThemedView>
         <Spacer height={16} />
         <ThemedView style={styles.socialButtonsContainer}>
@@ -264,7 +264,7 @@ export default function Register() {
           style={{ textAlign: "center", fontSize: 12, fontWeight: 500 }}
         >
           Already have an account?{" "}
-          <Link href="/login" style={{ color: "#0005F2" }}>
+          <Link href="/login" style={{ color: theme.link }}>
             Sign in
           </Link>
         </ThemedText>

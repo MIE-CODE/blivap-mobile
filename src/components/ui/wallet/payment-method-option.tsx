@@ -28,8 +28,8 @@ export const PaymentMethodOption = ({
       style={[
         styles.card,
         {
-          borderColor: selected ? theme.primary : theme.backgroundElement,
-          backgroundColor: "#ffffff",
+          borderColor: selected ? theme.primary : theme.hairline,
+          backgroundColor: theme.card,
         },
       ]}
     >
@@ -37,7 +37,7 @@ export const PaymentMethodOption = ({
         style={[
           styles.iconWrap,
           {
-            backgroundColor: selected ? "#FFE2E2" : theme.backgroundElement,
+            backgroundColor: selected ? theme.tint : theme.backgroundElement,
           },
         ]}
       >

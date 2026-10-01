@@ -80,7 +80,7 @@ export default function VerifyIdentityScreen() {
                       style={[
                         styles.warningBanner,
                         {
-                          backgroundColor: "#FFF1F1",
+                          backgroundColor: theme.tint,
                           borderLeftColor: theme.primary,
                         },
                       ]}
@@ -105,7 +105,8 @@ export default function VerifyIdentityScreen() {
                   style={[
                     styles.card,
                     {
-                      borderColor: "#E5E7EB",
+                      borderColor: theme.hairline,
+                      backgroundColor: theme.card,
                       shadowColor: theme.text,
                       opacity: isAbroad ? 0.55 : 1,
                     },

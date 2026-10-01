@@ -3,7 +3,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { router } from "expo-router";
+import { openRoute } from "@/utils/open-route";
 import { Image, Pressable, StyleSheet } from "react-native";
 import { useAppSelector } from "../../../../stores/hooks";
 
@@ -21,14 +21,14 @@ export function DonateBloodBrandHeader() {
       <ThemedView style={styles.rightGroup}>
         <Pressable
           style={[styles.iconBtn, { borderColor: theme.border }]}
-          onPress={() => router.push("/notification")}
+          onPress={() => openRoute("/notification")}
         >
           <NotificationsIcon color={theme.text} width={20} height={20} />
         </Pressable>
 
         <Pressable
           style={styles.profileGroup}
-          onPress={() => router.push("/profile")}
+          onPress={() => openRoute("/profile")}
         >
           <Image
             source={{ uri: user?.profileImage ?? "" }}
