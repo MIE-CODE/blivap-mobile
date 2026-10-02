@@ -50,7 +50,8 @@
         {
           "backgroundColor": "#960018",
           "image": "./assets/images/splash-mark.png",
-          "imageWidth": 96
+          "imageWidth": 160,
+          "resizeMode": "contain"
         }
       ],
       "expo-image",

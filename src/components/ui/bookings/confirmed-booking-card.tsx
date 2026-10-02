@@ -42,7 +42,10 @@ export function ConfirmedBookingCard({
             <Image source={{ uri: booking.avatar }} style={styles.avatar} />
           ) : (
             <ThemedView
-              style={[styles.avatar, { backgroundColor: theme.backgroundElement }]}
+              style={[
+                styles.avatar,
+                { backgroundColor: theme.backgroundElement },
+              ]}
             />
           )}
           <ThemedView style={styles.nameBlock}>
@@ -56,8 +59,12 @@ export function ConfirmedBookingCard({
           <ThemedView style={styles.acceptedBadge}>
             <ThemedText style={styles.acceptedText}>Accepted</ThemedText>
           </ThemedView>
-          <ThemedView style={[styles.bloodBadge, { backgroundColor: theme.primary }]}>
-            <ThemedText style={styles.bloodText}>{booking.bloodType}</ThemedText>
+          <ThemedView
+            style={[styles.bloodBadge, { backgroundColor: theme.primary }]}
+          >
+            <ThemedText style={styles.bloodText}>
+              {booking.bloodType}
+            </ThemedText>
           </ThemedView>
         </ThemedView>
       </ThemedView>
@@ -76,10 +83,15 @@ export function ConfirmedBookingCard({
 
       <ThemedView style={styles.actions}>
         <Pressable
-          style={[styles.chatBtn, { borderColor: theme.border }]}
+          style={[
+            styles.chatBtn,
+            { borderColor: theme.border, backgroundColor: theme.muted },
+          ]}
           onPress={() => onOpenChat(booking.id)}
         >
-          <ThemedText style={styles.chatText}>Chat</ThemedText>
+          <ThemedText style={[styles.chatText, { color: theme.text }]}>
+            Chat
+          </ThemedText>
         </Pressable>
         <Button
           style={styles.meetupBtn}
@@ -193,7 +205,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
   },
   chatText: {
     fontFamily: Fonts.inter.semiBold,

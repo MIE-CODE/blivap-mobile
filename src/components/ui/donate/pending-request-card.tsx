@@ -87,7 +87,10 @@ export function PendingRequestCard({
 
       <ThemedView style={styles.actions}>
         <Pressable
-          style={[styles.declineBtn, { borderColor: theme.border }]}
+          style={[
+            styles.declineBtn,
+            { borderColor: theme.border, backgroundColor: theme.muted },
+          ]}
           onPress={() => onDecline?.(request.id)}
         >
           <ThemedText style={[styles.declineText, { color: theme.text }]}>
@@ -203,7 +206,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
   },
   declineText: {
     fontFamily: Fonts.inter.semiBold,

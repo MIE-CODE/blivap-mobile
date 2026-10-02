@@ -4,6 +4,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { formatWhen } from "@/utils/bookings";
 import {
   MeetupParticipant,
   MeetupSession,
@@ -15,9 +16,8 @@ import {
   parseMeetupSession,
   resolveMyMeetupCode,
 } from "@/utils/meetups";
-import { formatWhen } from "@/utils/bookings";
-import { Feather } from "@expo/vector-icons";
 import { openRoute } from "@/utils/open-route";
+import { Feather } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -169,7 +169,8 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
   }, [sessionClosed, sessionId]);
 
   const isRequester = useMemo(
-    () => (session && user?.id ? meetupUserIsRequester(session, user.id) : null),
+    () =>
+      session && user?.id ? meetupUserIsRequester(session, user.id) : null,
     [session, user?.id],
   );
   const readOnly = session ? meetupReadOnly(session) : false;
@@ -233,7 +234,10 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
       setLocalError(null);
       if (isRequester) await $api.meetups.requesterConfirm(session.id);
       else await $api.meetups.donorConfirm(session.id);
-      Toast.show({ type: "success", text1: "Your donation confirmation was recorded." });
+      Toast.show({
+        type: "success",
+        text1: "Your donation confirmation was recorded.",
+      });
       const body = await $api.meetups.getSession(session.id);
       const parsed = parseMeetupSession(body);
       if (parsed) setSession(parsed);
@@ -269,10 +273,18 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
             onPress={() => undefined}
           >
             <ThemedText style={styles.sectionTitle}>How it works</ThemedText>
-            <ThemedText style={styles.infoLine}>Show your code. Enter theirs.</ThemedText>
-            <ThemedText style={styles.infoLine}>Both verify, then each confirms.</ThemedText>
-            <ThemedText style={styles.infoLine}>ID is your NIN. Meetup is in person.</ThemedText>
-            <ThemedText style={styles.infoLine}>Messages are on the Chat tab.</ThemedText>
+            <ThemedText style={styles.infoLine}>
+              Show your code. Enter theirs.
+            </ThemedText>
+            <ThemedText style={styles.infoLine}>
+              Both verify, then each confirms.
+            </ThemedText>
+            <ThemedText style={styles.infoLine}>
+              ID is your NIN. Meetup is in person.
+            </ThemedText>
+            <ThemedText style={styles.infoLine}>
+              Messages are on the Chat tab.
+            </ThemedText>
             <Button onPress={() => setInfoOpen(false)}>Close</Button>
           </Pressable>
         </Pressable>
@@ -313,11 +325,11 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
           ) : null}
 
           <ThemedView
-          style={[
-            styles.card,
-            { backgroundColor: theme.card, borderColor: theme.hairline },
-          ]}
-        >
+            style={[
+              styles.card,
+              { backgroundColor: theme.card, borderColor: theme.hairline },
+            ]}
+          >
             <ThemedText style={styles.status}>{session.status}</ThemedText>
             {session.expiresAt ? (
               <ThemedText style={[styles.meta, { color: theme.textSecondary }]}>
@@ -332,16 +344,19 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
 
           {ninOk && !readOnly && !gateSatisfied ? (
             <ThemedView
-          style={[
-            styles.card,
-            { backgroundColor: theme.card, borderColor: theme.hairline },
-          ]}
-        >
+              style={[
+                styles.card,
+                { backgroundColor: theme.card, borderColor: theme.hairline },
+              ]}
+            >
               {myCode ? (
                 <ThemedView
                   style={[
                     styles.codeBox,
-                    { backgroundColor: theme.muted, borderColor: theme.hairline },
+                    {
+                      backgroundColor: theme.muted,
+                      borderColor: theme.hairline,
+                    },
                   ]}
                 >
                   <ThemedText style={styles.kicker}>Your code</ThemedText>
@@ -350,7 +365,9 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
                   </ThemedText>
                 </ThemedView>
               ) : (
-                <ThemedText style={[styles.meta, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.meta, { color: theme.textSecondary }]}
+                >
                   Code not ready
                 </ThemedText>
               )}
@@ -388,11 +405,11 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
 
           {ninOk && gateSatisfied && !readOnly ? (
             <ThemedView
-          style={[
-            styles.card,
-            { backgroundColor: theme.card, borderColor: theme.hairline },
-          ]}
-        >
+              style={[
+                styles.card,
+                { backgroundColor: theme.card, borderColor: theme.hairline },
+              ]}
+            >
               <ThemedText style={styles.confirmLine}>
                 You · {myDonationDone ? "Confirmed" : "Waiting"}
               </ThemedText>
@@ -413,18 +430,22 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
 
           {readOnly || donationComplete ? (
             <ThemedView
-          style={[
-            styles.card,
-            { backgroundColor: theme.card, borderColor: theme.hairline },
-          ]}
-        >
+              style={[
+                styles.card,
+                { backgroundColor: theme.card, borderColor: theme.hairline },
+              ]}
+            >
               <ThemedText style={styles.sectionTitle}>
                 {donationComplete ? "Done" : "Closed"}
               </ThemedText>
             </ThemedView>
           ) : null}
 
-          <Button
+          <Pressable
+            style={[
+              styles.chatRow,
+              { backgroundColor: theme.card, borderColor: theme.hairline },
+            ]}
             onPress={() =>
               openRoute({
                 pathname: "/chat/[bookingId]",
@@ -432,8 +453,21 @@ export function MeetupScreen({ bookingId }: MeetupScreenProps) {
               })
             }
           >
-            Chat
-          </Button>
+            <ThemedView
+              style={[styles.chatIcon, { backgroundColor: theme.tint }]}
+            >
+              <Feather name="message-circle" size={18} color={theme.primary} />
+            </ThemedView>
+            <ThemedView style={styles.chatCopy}>
+              <ThemedText style={styles.chatTitle}>Chat</ThemedText>
+              <ThemedText
+                style={[styles.chatHint, { color: theme.textSecondary }]}
+              >
+                Message them about this meetup
+              </ThemedText>
+            </ThemedView>
+            <Feather name="chevron-right" size={18} color={theme.textSecondary} />
+          </Pressable>
         </ScrollView>
       )}
     </ThemedView>
@@ -597,5 +631,33 @@ const styles = StyleSheet.create({
   confirmLine: {
     fontFamily: Fonts.inter.regular,
     fontSize: 13,
+  },
+  chatRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 14,
+  },
+  chatIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  chatCopy: {
+    flex: 1,
+    gap: 2,
+    backgroundColor: "transparent",
+  },
+  chatTitle: {
+    fontFamily: Fonts.inter.semiBold,
+    fontSize: 14,
+  },
+  chatHint: {
+    fontFamily: Fonts.inter.regular,
+    fontSize: 12,
   },
 });
