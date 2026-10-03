@@ -14,18 +14,24 @@ export type ConfirmedBookingCardData = {
   hospital: string;
   bloodType: string;
   roleLabel: string;
+  /** True when the current user created the request (can PATCH /cancel). */
+  isRequester: boolean;
 };
 
 type ConfirmedBookingCardProps = {
   booking: ConfirmedBookingCardData;
   onOpenMeetup: (id: string) => void;
   onOpenChat: (id: string) => void;
+  onCancel: (id: string, isRequester: boolean) => void;
+  cancelling?: boolean;
 };
 
 export function ConfirmedBookingCard({
   booking,
   onOpenMeetup,
   onOpenChat,
+  onCancel,
+  cancelling = false,
 }: ConfirmedBookingCardProps) {
   const theme = useTheme();
 
@@ -101,6 +107,24 @@ export function ConfirmedBookingCard({
           Open meetup
         </Button>
       </ThemedView>
+
+      <Pressable
+        disabled={cancelling}
+        style={[
+          styles.cancelBtn,
+          {
+            borderColor: theme.status.danger,
+            opacity: cancelling ? 0.6 : 1,
+          },
+        ]}
+        onPress={() => onCancel(booking.id, booking.isRequester)}
+      >
+        <ThemedText
+          style={[styles.cancelText, { color: theme.status.danger }]}
+        >
+          {cancelling ? "Cancelling…" : "Cancel booking"}
+        </ThemedText>
+      </Pressable>
     </ThemedView>
   );
 }
@@ -214,5 +238,16 @@ const styles = StyleSheet.create({
     flex: 1.4,
     borderRadius: 100,
     paddingVertical: 12,
+  },
+  cancelBtn: {
+    borderWidth: 1,
+    borderRadius: 100,
+    paddingVertical: 11,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelText: {
+    fontFamily: Fonts.inter.semiBold,
+    fontSize: 13,
   },
 });

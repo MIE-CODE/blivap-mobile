@@ -31,5 +31,11 @@ export default () => {
         method: "PATCH",
       });
     },
+    /** Requester only — cancels pending, accepted, or awaiting-welfare bookings. */
+    async cancel(id: string): Promise<IResponse<unknown>> {
+      return await api(`/bookings/${encodeURIComponent(id)}/cancel`, {
+        method: "PATCH",
+      });
+    },
   };
 };

@@ -17,15 +17,24 @@ import { Fonts } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import {
   AppBooking,
-  bookingStatusLabel,
   formatWhen,
+  isActiveAcceptedBooking,
+  isPastBooking,
   parseBookingPatch,
   parseBookings,
+  pastBookingLabel,
 } from "@/utils/bookings";
+import { parseMeetupEnsure } from "@/utils/meetups";
 import { useFocusEffect } from "expo-router";
 import { openRoute } from "@/utils/open-route";
 import { useCallback, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import Toast from "react-native-toast-message";
 import { $api } from "../../../../services/api-client";
 import { getErrorMessage } from "../../../../utils/lib";
@@ -47,6 +56,7 @@ function toPending(booking: AppBooking): PendingDonationRequest {
 }
 
 function toRecent(booking: AppBooking): RecentDonation {
+  const label = pastBookingLabel(booking);
   return {
     id: booking.id,
     bloodType: booking.bloodType,
@@ -54,8 +64,8 @@ function toRecent(booking: AppBooking): RecentDonation {
     date: formatWhen(booking.scheduledAt),
     location: booking.hospitalName,
     status: booking.status === "completed" ? "completed" : "pending",
-    statusLabel: bookingStatusLabel(booking.status),
-    title: bookingStatusLabel(booking.status),
+    statusLabel: label,
+    title: label,
   };
 }
 
@@ -65,6 +75,7 @@ export function BookingsScreen() {
   const [received, setReceived] = useState<AppBooking[]>([]);
   const [sent, setSent] = useState<AppBooking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   const load = useCallback(async (silent = false) => {
     try {
@@ -160,12 +171,55 @@ export function BookingsScreen() {
     });
   };
 
+  const cancelBooking = (id: string, isRequester: boolean) => {
+    Alert.alert(
+      "Cancel booking?",
+      "This ends the meetup for both of you. You can’t undo it.",
+      [
+        { text: "Keep booking", style: "cancel" },
+        {
+          text: "Cancel booking",
+          style: "destructive",
+          onPress: () => void runCancel(id, isRequester),
+        },
+      ],
+    );
+  };
+
+  const runCancel = async (id: string, isRequester: boolean) => {
+    setCancellingId(id);
+    try {
+      if (isRequester) {
+        await $api.bookings.cancel(id);
+      } else {
+        const ensured = await $api.meetups.ensureSession(id);
+        const session = parseMeetupEnsure(ensured);
+        if (!session?.sessionId) {
+          throw new Error("Could not open the meetup session to cancel");
+        }
+        await $api.meetups.terminate(session.sessionId, {
+          reason: "Cancelled by donor",
+        });
+      }
+      Toast.show({ type: "success", text1: "Booking cancelled" });
+      setActiveTab("past");
+      await load(true);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: getErrorMessage(error, "Could not cancel this booking"),
+      });
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
   const pendingRequests = received
     .filter((booking) => booking.status === "pending")
     .map(toPending);
   const confirmed = [
     ...received
-      .filter((booking) => booking.status === "accepted")
+      .filter((booking) => isActiveAcceptedBooking(booking))
       .map((booking) => ({
         id: booking.id,
         name: booking.requesterName,
@@ -174,9 +228,10 @@ export function BookingsScreen() {
         hospital: booking.hospitalName,
         bloodType: booking.bloodType,
         roleLabel: "Requester",
+        isRequester: false,
       })),
     ...sent
-      .filter((booking) => booking.status === "accepted")
+      .filter((booking) => isActiveAcceptedBooking(booking))
       .map((booking) => ({
         id: booking.id,
         name: booking.donorName,
@@ -185,6 +240,7 @@ export function BookingsScreen() {
         hospital: booking.hospitalName,
         bloodType: booking.bloodType,
         roleLabel: "Donor",
+        isRequester: true,
       })),
   ];
   const awaitingWelfare = sent.filter(
@@ -192,19 +248,14 @@ export function BookingsScreen() {
       booking.status === "awaiting_welfare_funding" && booking.welfare,
   );
   const past = [...received, ...sent]
-    .filter(
-      (booking) =>
-        booking.status !== "pending" &&
-        booking.status !== "accepted" &&
-        booking.status !== "awaiting_welfare_funding",
-    )
+    .filter((booking) => isPastBooking(booking))
     .sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt))
     .map(toRecent);
 
   const tabs: { key: BookingsTab; label: string; count: number }[] = [
     { key: "pending", label: "Pending", count: pendingRequests.length },
     { key: "confirmed", label: "Confirmed", count: confirmed.length },
-    { key: "past", label: "Past", count: 0 },
+    { key: "past", label: "Past", count: past.length },
   ];
   const tabEmpty =
     !loading &&
@@ -341,6 +392,8 @@ export function BookingsScreen() {
                   booking={booking}
                   onOpenMeetup={openMeetup}
                   onOpenChat={(id) => openChat(id, booking.name)}
+                  onCancel={cancelBooking}
+                  cancelling={cancellingId === booking.id}
                 />
               ))}
             </ThemedView>

@@ -38,5 +38,18 @@ export default () => {
         { method: "PATCH" },
       );
     },
+    /** Either party — ends an active meetup and cancels the booking. */
+    async terminate(
+      sessionId: string,
+      payload: { reason: string; details?: string },
+    ): Promise<IResponse<unknown>> {
+      return await api(
+        `/meetups/${encodeURIComponent(sessionId)}/terminate`,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+        },
+      );
+    },
   };
 };

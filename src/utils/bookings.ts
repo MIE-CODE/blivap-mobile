@@ -46,6 +46,31 @@ export function normalizeBookingStatus(status: string): string {
   return lower;
 }
 
+/** Matches backend meetup grace after scheduledAt (default 48h). */
+const MEETUP_GRACE_MS = 48 * 60 * 60 * 1000;
+
+/** Accepted booking still within the meetup window. */
+export function isActiveAcceptedBooking(booking: Pick<AppBooking, "status" | "scheduledAt">): boolean {
+  if (normalizeBookingStatus(booking.status) !== "accepted") return false;
+  const scheduled = new Date(booking.scheduledAt).getTime();
+  if (Number.isNaN(scheduled)) return true;
+  return Date.now() <= scheduled + MEETUP_GRACE_MS;
+}
+
+/** Finished, cancelled, expired, or past the meetup window. */
+export function isPastBooking(booking: Pick<AppBooking, "status" | "scheduledAt">): boolean {
+  const status = normalizeBookingStatus(booking.status);
+  if (status === "pending" || status === "awaiting_welfare_funding") return false;
+  if (status === "accepted") return !isActiveAcceptedBooking(booking);
+  return true;
+}
+
+export function pastBookingLabel(booking: Pick<AppBooking, "status" | "scheduledAt">): string {
+  const status = normalizeBookingStatus(booking.status);
+  if (status === "accepted" && isPastBooking(booking)) return "Expired";
+  return bookingStatusLabel(status);
+}
+
 function personFrom(ref: unknown): { name: string; image: string; bloodType: string } {
   const record = asRecord(ref);
   if (!record) return { name: "", image: "", bloodType: "" };
